@@ -54,6 +54,8 @@ const EditableCell = ({ value, onChange, align = 'left', sx = {}, colSpan }) => 
     );
 };
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+console.log(API_URL);
 const ClientOrders = () => {
     const sizes = [];
     for (let i = 3; i <= 18; i += 0.5) sizes.push(i);
@@ -65,7 +67,7 @@ const ClientOrders = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/orders');
+                const response = await fetch(`${API_URL}/api/orders`);
                 const data = await response.json();
 
                 if (!Array.isArray(data)) { setTableData([]); return; }

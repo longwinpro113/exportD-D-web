@@ -12,6 +12,8 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const buildSizes = () => {
   const s = [];
   for (let i = 3; i <= 18; i += 0.5) s.push(i);
@@ -73,7 +75,7 @@ const EditDialog = ({ open, row, onClose, onSave }) => {
       });
       payload.shipped_quantity = computedShipped;
 
-      const res = await fetch(`http://localhost:5000/api/export/${row.id}`, {
+      const res = await fetch(`${API_URL}/api/export/${row.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -168,7 +170,7 @@ const DeleteDialog = ({ open, row, onClose, onConfirm }) => {
     setDeleting(true);
     setError('');
     try {
-      const res = await fetch(`http://localhost:5000/api/export/${row.id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/api/export/${row.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error((await res.json()).error || 'Delete failed');
       onConfirm();
     } catch (err) {
@@ -227,7 +229,7 @@ const StockReport = () => {
     setLoading(true);
     setError('');
     try {
-      let url = 'http://localhost:5000/api/export';
+      let url = `${API_URL}/api/export`;
       const trimmed = search.trim();
       if (trimmed) {
         url += isDateSearch(trimmed)

@@ -12,6 +12,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const buildSizes = () => {
     const s = [];
     for (let i = 3; i <= 18; i += 0.5) s.push(i);
@@ -40,7 +42,7 @@ const EntryForm = () => {
         const fetchOrders = async () => {
             setLoadingOrders(true);
             try {
-                const res = await fetch('http://localhost:5000/api/orders');
+                const res = await fetch(`${API_URL}/api/orders`);
                 const data = await res.json();
                 if (Array.isArray(data)) setOrderOptions(data);
             } catch (err) {
@@ -81,7 +83,7 @@ const EntryForm = () => {
             const shipped_quantity = Object.values(formData.sizeValues)
                 .reduce((sum, v) => sum + (parseFloat(v) || 0), 0);
 
-            const prevRes = await fetch(`http://localhost:5000/api/export?ry_number=${encodeURIComponent(formData.donHang)}`);
+            const prevRes = await fetch(`${API_URL}/api/export?ry_number=${encodeURIComponent(formData.donHang)}`);
             const prevData = await prevRes.json();
 
             const prevTotal = Array.isArray(prevData)
@@ -107,7 +109,7 @@ const EntryForm = () => {
                 ...sizePayload
             };
 
-            const res = await fetch('http://localhost:5000/api/export', {
+            const res = await fetch(`${API_URL}/api/export`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
