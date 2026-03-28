@@ -93,7 +93,7 @@ const ClientOrders = () => {
                     <Box sx={{ width: '380px', mt: 1 }}>
                         <TextField
                             fullWidth size="small"
-                            placeholder="Nhập mã đơn hàng và nhấn Enter..."
+                            placeholder="Nhập mã đơn hàng ..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             InputProps={{
