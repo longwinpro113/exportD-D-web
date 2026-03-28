@@ -11,7 +11,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import ClearIcon from '@mui/icons-material/Clear';
 
+
+// const API_URL = "http://localhost:5000"
 const API_URL = "https://exportd-d-api.onrender.com";
 
 const buildSizes = () => {
@@ -73,7 +76,6 @@ const EditDialog = ({ open, row, onClose, onSave }) => {
       sizes.forEach(size => {
         payload[sizeToCol(size)] = parseFloat(form[sizeToCol(size)]) || 0;
       });
-      payload.shipped_quantity = computedShipped;
 
       const res = await fetch(`${API_URL}/api/export/${row.id}`, {
         method: 'PATCH',
@@ -232,9 +234,11 @@ const StockReport = () => {
     let url = `${API_URL}/api/export`;
     const trimmed = search.trim();
     if (trimmed) {
-      url += isDateSearch(trimmed)
-        ? `?date=${encodeURIComponent(trimmed)}`
-        : `?ry_number=${encodeURIComponent(trimmed)}`;
+      if (isDateSearch(trimmed)) {
+        url += `?date=${encodeURIComponent(trimmed)}`;
+      } else {
+        url += `?ry_number=${encodeURIComponent(trimmed)}`;
+      }
     }
 
     const fetchPromise = fetch(url).then(async (res) => {
@@ -263,13 +267,6 @@ const StockReport = () => {
     fetchData(debouncedSearch);
   }, [debouncedSearch, fetchData]);
 
-  const fixedColCount = 10;
-
-  const headerCell = (extra = {}) => ({
-    color: '#475569', fontWeight: 700, fontSize: '0.82rem',
-    bgcolor: '#f8fafc', whiteSpace: 'nowrap', py: 1.2, ...extra
-  });
-
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, width: '100%', height: '100%' }}>
       <Paper elevation={0} sx={{
@@ -295,29 +292,41 @@ const StockReport = () => {
             </Box>
           </Box>
 
-          <Box sx={{ width: '420px', mt: 1 }}>
+          <Box sx={{ width: '360px', mt: 1 }}>
             <TextField
-              fullWidth size="small"
-              placeholder="Tìm theo ngày (DD/MM/YYYY) hoặc mã đơn hàng..."
+              placeholder="Tìm ngày (dd/mm) hoặc mã đơn hàng..."
+              variant="outlined"
+              size="small"
+              fullWidth
+              autoComplete="off"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    {loading
-                      ? <CircularProgress size={16} sx={{ color: '#94a3b8' }} />
-                      : <SearchIcon sx={{ color: '#94a3b8', fontSize: 20 }} />
-                    }
+                    <SearchIcon sx={{ color: '#94a3b8', fontSize: '1.2rem' }} />
+                  </InputAdornment>
+                ),
+                endAdornment: searchTerm && (
+                  <InputAdornment position="end">
+                    <IconButton size="small" onClick={() => setSearchTerm('')} edge="end">
+                      <ClearIcon sx={{ fontSize: '1.1rem', color: '#94a3b8' }} />
+                    </IconButton>
                   </InputAdornment>
                 ),
               }}
               sx={{
+                maxWidth: 400,
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px', backgroundColor: '#ffffff',
-                  fontSize: '0.9rem', color: '#334155',
+                  borderRadius: '12px',
+                  bgcolor: '#ffffff',
                   '& fieldset': { borderColor: '#e2e8f0' },
                   '&:hover fieldset': { borderColor: '#cbd5e1' },
-                  '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
+                  '&.Mui-focused fieldset': { borderColor: '#1976d2' },
+                  '& input:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 1000px #ffffff inset !important',
+                    WebkitTextFillColor: '#1e293b !important',
+                  }
                 }
               }}
             />
@@ -325,49 +334,67 @@ const StockReport = () => {
         </Box>
 
         {/* Table */}
-        <Box sx={{ flexGrow: 1, borderTop: '1px solid #e2e8f0', width: '100%', overflow: 'auto' }}>
-          <TableContainer sx={{ minWidth: 2700, height: '100%' }}>
-            <Table size="small" stickyHeader sx={{ '& th, & td': { border: '1px solid #f1f5f9', py: 1.1, px: 1, textAlign: 'center' } }}>
+        <Box sx={{ flexGrow: 1, borderTop: '1px solid #e2e8f0', width: '100%', height: '100%' }}>
+          <TableContainer sx={{ 
+              width: '100%', 
+              height: '100%', 
+              overflow: 'auto', // Đây là nơi duy nhất cho phép cuộn
+              position: 'relative'
+          }}>
+            <Table size="small" sx={{ 
+                minWidth: 2800, // Buộc TableContainer hiển thị thanh cuộn ngang
+                '& th, & td': { border: '1px solid #f1f5f9', py: 1.1, px: 1, textAlign: 'center' },
+                borderCollapse: 'separate',
+                borderSpacing: 0
+            }}>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ ...headerCell(), width: 40 }}>STT</TableCell>
-                  <TableCell sx={{ ...headerCell(), minWidth: 130 }}>Đơn Hàng</TableCell>
-                  <TableCell sx={{ ...headerCell(), minWidth: 80 }}>Article</TableCell>
-                  <TableCell sx={{ ...headerCell(), minWidth: 150 }}>Model Name</TableCell>
-                  <TableCell sx={{ ...headerCell({ color: '#1976d2', bgcolor: '#e8f4fd' }), minWidth: 90 }}>Tổng Cần Giao</TableCell>
-                  <TableCell sx={{ ...headerCell({ color: '#7c3aed', bgcolor: '#f5f3ff' }), minWidth: 90 }}>Tổng Tích Lũy</TableCell>
-                  <TableCell sx={{ ...headerCell({ color: '#0369a1', bgcolor: '#f0f9ff' }), minWidth: 110 }}>Tổng SL Trong Ngày</TableCell>
-                  <TableCell sx={{ ...headerCell(), minWidth: 90 }}>SL Còn Lại</TableCell>
-                  <TableCell sx={{ ...headerCell(), minWidth: 110 }}>Trạng Thái</TableCell>
+                    {['STT', 'Đơn Hàng', 'Article', 'Model Name', 'Tổng Cần Giao', 'Tổng Tích Lũy', 'Tổng SL Trong Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+                        <TableCell key={h} align="center" sx={{
+                            color: i >= 4 && i <= 7 ? '#1976d2' : '#475569',
+                            bgcolor: i >= 4 && i <= 7 ? '#f1f7ff' : '#f8fafc',
+                            fontWeight: 700, fontSize: '0.8rem', whiteSpace: 'nowrap',
+                            minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 3 ? 150 : 120,
+                            maxWidth: i === 0 ? 50 : i === 1 ? 160 : 'none',
+                            position: 'sticky !important',
+                            top: 0,
+                            left: i === 0 ? 0 : i === 1 ? 50 : 'auto',
+                            zIndex: i <= 1 ? 12 : 2,
+                            borderRight: i <= 1 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
+                            boxShadow: i === 1 ? '2px 0 5px -1px rgba(0,0,0,0.1)' : 'none'
+                        }}>{h}</TableCell>
+                    ))}
                   {sizes.map(size => (
-                    <TableCell key={size} sx={{ ...headerCell(), minWidth: 40 }}>{size}</TableCell>
+                    <TableCell key={size} sx={{ 
+                        color: '#475569', fontWeight: 700, fontSize: '0.82rem', bgcolor: '#f8fafc', 
+                        minWidth: 40, position: 'sticky', top: 0, zIndex: 1
+                    }}>{size}</TableCell>
                   ))}
-                  <TableCell sx={{ ...headerCell(), minWidth: 80, position: 'sticky', right: 0, zIndex: 3, bgcolor: '#f8fafc' }}>
+                  <TableCell sx={{ 
+                      color: '#475569', fontWeight: 700, fontSize: '0.82rem', bgcolor: '#f8fafc', 
+                      minWidth: 80, position: 'sticky', top: 0, right: 0, zIndex: 13 
+                  }}>
                     Actions
                   </TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
-                {tableData.length === 0 && !loading && (
-                  <TableRow>
-                    <TableCell colSpan={fixedColCount + sizes.length} sx={{ py: 6, color: '#94a3b8', fontSize: '0.9rem', fontStyle: 'italic' }}>
-                      {/* Xóa text no export data yet theo yêu cầu */}
-                    </TableCell>
-                  </TableRow>
-                )}
-
                 {tableData.map((group, groupIdx) => (
                   <React.Fragment key={groupIdx}>
                     <TableRow>
-                      <TableCell colSpan={fixedColCount + sizes.length} sx={{ bgcolor: '#f0f7ff', py: 0.8, borderBottom: '2px solid #dbeafe' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TableCell colSpan={9 + sizes.length + 1} sx={{ bgcolor: '#f0f7ff', py: 0.8, borderBottom: '2px solid #dbeafe', textAlign: 'left !important', p: 0 }}>
+                        <Box sx={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: 1, 
+                            position: 'sticky', 
+                            left: 50,
+                            py: 0.8,
+                            px: 2
+                        }}>
                           <CalendarTodayOutlinedIcon sx={{ fontSize: '1rem', color: '#1976d2' }} />
                           <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.9rem' }}>{group.date}</Typography>
-                          <Typography sx={{ fontSize: '0.8rem', color: '#64748b', ml: 1 }}>
-                            — {group.rows.length} đơn hàng,&nbsp;
-                            Tổng: <strong>{group.rows.reduce((s, r) => s + (parseFloat(r.shipped_quantity) || 0), 0)}</strong>
-                          </Typography>
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -377,8 +404,17 @@ const StockReport = () => {
                       const remVal = parseFloat(row.remaining_quantity) || 0;
                       return (
                         <TableRow key={row.id} hover sx={{ bgcolor: '#ffffff' }}>
-                          <TableCell sx={{ color: '#94a3b8', fontSize: '0.82rem' }}>{rowIdx + 1}</TableCell>
-                          <TableCell sx={{ color: '#1e293b', fontSize: '0.85rem', fontWeight: 600 }}>{row.ry_number}</TableCell>
+                          <TableCell align="center" sx={{ 
+                                                fontWeight: 500, color: '#94a3b8', fontSize: '0.82rem',
+                                                position: 'sticky !important', left: '0 !important', bgcolor: '#ffffff', zIndex: 1,
+                                                borderRight: '1px solid #f1f5f9'
+                                            }}>{rowIdx + 1}</TableCell>
+                          <TableCell align="center" sx={{ 
+                                                fontWeight: 800, color: '#1e293b',
+                                                position: 'sticky !important', left: '50px !important', bgcolor: '#ffffff', zIndex: 1,
+                                                borderRight: '2px solid #e2e8f0',
+                                                boxShadow: '2px 0 5px -1px rgba(0,0,0,0.1)'
+                                            }}>{row.ry_number}</TableCell>
                           <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.article || '—'}</TableCell>
                           <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.model_name || '—'}</TableCell>
                           <TableCell sx={{ color: '#1976d2', fontWeight: 700, fontSize: '0.85rem', bgcolor: '#f8fbff' }}>{row.total_quantity ?? '—'}</TableCell>
@@ -408,17 +444,13 @@ const StockReport = () => {
                             );
                           })}
 
-                          {/* Actions */}
                           <TableCell sx={{ position: 'sticky', right: 0, bgcolor: '#ffffff', zIndex: 1, px: 0.5 }}>
                             <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                               <Tooltip title="Edit" placement="top">
                                 <IconButton
                                   size="small"
                                   onClick={() => setEditRow(row)}
-                                  sx={{
-                                    color: '#1976d2', borderRadius: '6px',
-                                    '&:hover': { bgcolor: '#e3f2fd' }
-                                  }}
+                                  sx={{ color: '#1976d2', borderRadius: '6px', '&:hover': { bgcolor: '#e3f2fd' } }}
                                 >
                                   <EditOutlinedIcon sx={{ fontSize: 16 }} />
                                 </IconButton>
@@ -427,10 +459,7 @@ const StockReport = () => {
                                 <IconButton
                                   size="small"
                                   onClick={() => setDeleteRow(row)}
-                                  sx={{
-                                    color: '#ef4444', borderRadius: '6px',
-                                    '&:hover': { bgcolor: '#fef2f2' }
-                                  }}
+                                  sx={{ color: '#ef4444', borderRadius: '6px', '&:hover': { bgcolor: '#fef2f2' } }}
                                 >
                                   <DeleteOutlineIcon sx={{ fontSize: 16 }} />
                                 </IconButton>
