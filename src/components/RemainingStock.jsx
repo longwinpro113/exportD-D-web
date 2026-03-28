@@ -202,9 +202,9 @@ const RemainingStock = () => {
                         }}>
                           <CalendarTodayOutlinedIcon sx={{ fontSize: '1rem', color: '#c2410c' }} />
                           <Typography sx={{ fontWeight: 700, color: '#c2410c', fontSize: '0.9rem' }}>Ngày : {group.date}</Typography>
-                          <Typography sx={{ fontSize: '0.8rem', color: '#9a3412', ml: 1, fontWeight: 500 }}>
+                          {/* <Typography sx={{ fontSize: '0.8rem', color: '#9a3412', ml: 1, fontWeight: 500 }}>
                             — {group.rows.length} Mã đơn hàng
-                          </Typography>
+                          </Typography> */}
                         </Box>
                       </TableCell>
                     </TableRow>

@@ -109,7 +109,7 @@ const EditDialog = ({ open, row, onClose, onSave }) => {
 
         <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
           <Typography sx={{ fontSize: '0.85rem', color: '#475569' }}>
-            Shipped today (computed): <strong style={{ color: '#1976d2' }}>{computedShipped}</strong>
+            Đơn hàng giao trong ngày: <strong style={{ color: '#1976d2' }}>{computedShipped}</strong>
           </Typography>
         </Box>
 
@@ -188,12 +188,12 @@ const DeleteDialog = ({ open, row, onClose, onConfirm }) => {
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: '12px' } }}>
       <DialogContent sx={{ pt: 3, pb: 1, textAlign: 'center' }}>
         <WarningAmberRoundedIcon sx={{ fontSize: 48, color: '#f59e0b', mb: 1 }} />
-        <Typography sx={{ fontWeight: 700, fontSize: '1rem', mb: 0.5 }}>Delete this record?</Typography>
+        <Typography sx={{ fontWeight: 700, fontSize: '1rem', mb: 0.5 }}>Xóa đơn hàng?</Typography>
         <Typography sx={{ fontSize: '0.85rem', color: '#64748b' }}>
           <strong>{row.ry_number}</strong> — {row.export_date}
         </Typography>
         <Typography sx={{ fontSize: '0.82rem', color: '#94a3b8', mt: 0.5 }}>
-          This action cannot be undone.
+          Hành động này không thể hoàn tác.
         </Typography>
         {error && <Alert severity="error" sx={{ mt: 2, borderRadius: '8px', textAlign: 'left' }}>{error}</Alert>}
       </DialogContent>
