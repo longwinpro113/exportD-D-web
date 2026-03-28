@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Typography, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, TextField,
-  InputAdornment, IconButton
+    Box, Typography, Paper, Table, TableBody, TableCell,
+    TableContainer, TableHead, TableRow, TextField,
+    InputAdornment, IconButton
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SyncIcon from '@mui/icons-material/Sync';
@@ -53,9 +53,6 @@ const EditableCell = ({ value, onChange, align = 'left', sx = {}, colSpan }) => 
         </TableCell>
     );
 };
-
-// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-// console.log('API_URL', API_URL);
 
 const ClientOrders = () => {
     const sizes = [];
@@ -147,14 +144,10 @@ const ClientOrders = () => {
                                 Danh sách chi tiết các đơn hàng và số liệu từng size
                             </Typography>
                         </Box>
-                        <IconButton sx={{
-                            border: '1px solid #e2e8f0', borderRadius: '8px',
-                            color: '#64748b', backgroundColor: '#f8fafc',
-                            '&:hover': { backgroundColor: '#f1f5f9' },
-                            width: 38, height: 38
-                        }}>
-                            <SyncIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
+                        <Box sx={{ textAlign: 'right' }}>
+                            <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>Đơn vị lãnh</Typography>
+                            <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', mt: 0.5, fontWeight: 500 }}>Công Ty Lạc Tỷ</Typography>
+                        </Box>
                     </Box>
 
                     <Box sx={{ width: '380px', mt: 1 }}>

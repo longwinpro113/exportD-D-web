@@ -141,14 +141,6 @@ const RemainingStock = () => {
                                 <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>Tổng còn lại</Typography>
                                 <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', mt: 0.5, fontWeight: 500 }}>14617</Typography>
                             </Box>
-                            <IconButton sx={{
-                                border: '1px solid #e2e8f0', borderRadius: '8px',
-                                color: '#64748b', backgroundColor: '#f8fafc',
-                                '&:hover': { backgroundColor: '#f1f5f9' },
-                                width: 38, height: 38
-                            }}>
-                                <SyncIcon sx={{ fontSize: 20 }} />
-                            </IconButton>
                         </Box>
                     </Box>
 

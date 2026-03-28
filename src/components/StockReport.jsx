@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box, Typography, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, TextField, InputAdornment,
-  CircularProgress, Alert, Chip, IconButton, Tooltip,
+  CircularProgress, Alert, Snackbar, Chip, IconButton, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, Button,
   Divider
 } from '@mui/material';
@@ -11,6 +11,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -216,6 +218,7 @@ const DeleteDialog = ({ open, row, onClose, onConfirm }) => {
 // ─── Main StockReport ─────────────────────────────────────────────────────────
 const StockReport = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -227,33 +230,48 @@ const StockReport = () => {
 
   const fetchData = useCallback(async (search) => {
     setLoading(true);
-    setError('');
+    let url = `${API_URL}/api/export`;
+    const trimmed = search.trim();
+    if (trimmed) {
+      url += isDateSearch(trimmed)
+        ? `?date=${encodeURIComponent(trimmed)}`
+        : `?ry_number=${encodeURIComponent(trimmed)}`;
+    }
+
+    const fetchPromise = fetch(url).then(async (res) => {
+      if (!res.ok) throw new Error('Kết nối thất bại!');
+      return res.json();
+    });
+
+    toast.promise(fetchPromise, {
+      pending: 'Đang kết nối máy chủ...',
+      success: 'Tải dữ liệu thành công!',
+      error: 'Lỗi kết nối máy chủ!'
+    }, {
+      position: 'bottom-right',
+      toastId: 'api-connection'
+    });
+
     try {
-      let url = `${API_URL}/api/export`;
-      const trimmed = search.trim();
-      if (trimmed) {
-        url += isDateSearch(trimmed)
-          ? `?date=${encodeURIComponent(trimmed)}`
-          : `?ry_number=${encodeURIComponent(trimmed)}`;
-      }
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Server connection failed.');
-      const data = await res.json();
+      const data = await fetchPromise;
       setTableData(Array.isArray(data) ? groupByDate(data) : []);
     } catch (err) {
-      setError(err.message || 'Failed to load data.');
       setTableData([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { fetchData(''); }, [fetchData]);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   useEffect(() => {
-    const t = setTimeout(() => fetchData(searchTerm), 400);
-    return () => clearTimeout(t);
-  }, [searchTerm, fetchData]);
+    fetchData(debouncedSearch);
+  }, [debouncedSearch, fetchData]);
 
   const fixedColCount = 10;
 
@@ -314,8 +332,6 @@ const StockReport = () => {
               }}
             />
           </Box>
-
-          {error && <Alert severity="error" sx={{ mt: 1.5, borderRadius: '8px', fontSize: '0.85rem' }}>{error}</Alert>}
         </Box>
 
         {/* Table */}
@@ -346,7 +362,7 @@ const StockReport = () => {
                 {tableData.length === 0 && !loading && (
                   <TableRow>
                     <TableCell colSpan={fixedColCount + sizes.length} sx={{ py: 6, color: '#94a3b8', fontSize: '0.9rem', fontStyle: 'italic' }}>
-                      {searchTerm ? 'No matching records found.' : 'No export data yet.'}
+                      {/* Xóa text no export data yet theo yêu cầu */}
                     </TableCell>
                   </TableRow>
                 )}

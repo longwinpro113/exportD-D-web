@@ -15,6 +15,8 @@ import ClientOrders from './components/ClientOrders';
 import EntryForm from './components/EntryForm';
 import StockReport from './components/StockReport';
 import RemainingStock from './components/RemainingStock';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const DRAWER_WIDTH = 240;
 const COLLAPSED_WIDTH = 76;
@@ -150,6 +152,9 @@ function App() {
           </Routes>
         </Box>
       </Box>
+      
+      {/* Toast Notification Container */}
+      <ToastContainer position="bottom-right" autoClose={3000} />
     </Box>
   );
 }

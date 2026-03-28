@@ -283,19 +283,36 @@ const EntryForm = () => {
                 </Box>
 
                 {/* Size Input Grid */}
-                <Box sx={{ mt: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 2 }}>
+                <Box sx={{ mt: 2 }}>
+                    <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 3, 
+                        mb: 2,
+                        minHeight: 40 // Cố định chiều cao để không bị nhảy layout khi chip xuất hiện/biến mất
+                    }}>
                         <Typography sx={{ fontWeight: 500, fontSize: '1rem', color: '#1e293b' }}>
                             Nhập số lượng size
                         </Typography>
                         {shippedPreview > 0 && (
-                            <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#1976d2', bgcolor: '#e3f2fd', px: 1.5, py: 0.5, borderRadius: '6px' }}>
+                            <Box sx={{ 
+                                fontWeight: 700, 
+                                fontSize: '0.9rem', 
+                                color: '#1976d2', 
+                                bgcolor: '#e3f2fd', 
+                                px: 1.5, 
+                                py: 0.5, 
+                                borderRadius: '6px',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}>
                                 SL giao hôm nay: {shippedPreview}
-                            </Typography>
+                            </Box>
                         )}
                     </Box>
-
+                    
                     <Box sx={{
+                        mt: 4, // Đẩy nhẹ các ô input xuống dưới
                         display: 'grid',
                         gridTemplateColumns: {
                             xs: 'repeat(auto-fill, minmax(70px, 1fr))',
