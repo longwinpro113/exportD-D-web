@@ -68,7 +68,7 @@ const ClientOrders = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`${API_URL}/api/orders`);
+                const response = await fetch('https://exportd-d-api.onrender.com/api/orders');
                 const data = await response.json();
 
                 if (!Array.isArray(data)) { setTableData([]); return; }
