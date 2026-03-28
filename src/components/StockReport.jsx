@@ -14,8 +14,7 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
 import { toast } from 'react-toastify';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-console.log("API_URL", API_URL)
+const API_URL = "https://exportd-d-api.onrender.com";
 
 const buildSizes = () => {
   const s = [];
@@ -83,7 +82,6 @@ const EditDialog = ({ open, row, onClose, onSave }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      console.log("res", res)
 
       if (!res.ok) throw new Error((await res.json()).error || 'Update failed');
       onSave();
