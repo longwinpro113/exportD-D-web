@@ -55,7 +55,8 @@ const EditableCell = ({ value, onChange, align = 'left', sx = {}, colSpan }) => 
 };
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-console.log(API_URL);
+console.log('API_URL', API_URL);
+
 const ClientOrders = () => {
     const sizes = [];
     for (let i = 3; i <= 18; i += 0.5) sizes.push(i);
