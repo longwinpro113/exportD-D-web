@@ -365,8 +365,8 @@ const StockReport = () => {
                           <CalendarTodayOutlinedIcon sx={{ fontSize: '1rem', color: '#1976d2' }} />
                           <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.9rem' }}>{group.date}</Typography>
                           <Typography sx={{ fontSize: '0.8rem', color: '#64748b', ml: 1 }}>
-                            — {group.rows.length} orders,&nbsp;
-                            total: <strong>{group.rows.reduce((s, r) => s + (parseFloat(r.shipped_quantity) || 0), 0)}</strong>
+                            — {group.rows.length} đơn hàng,&nbsp;
+                            Tổng: <strong>{group.rows.reduce((s, r) => s + (parseFloat(r.shipped_quantity) || 0), 0)}</strong>
                           </Typography>
                         </Box>
                       </TableCell>
