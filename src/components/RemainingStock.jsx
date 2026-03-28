@@ -1,254 +1,279 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box, Typography, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, TextField,
-  IconButton, InputAdornment
+  TableContainer, TableHead, TableRow, TextField, InputAdornment,
+  CircularProgress, IconButton, Tooltip, Divider, Chip
 } from '@mui/material';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import SearchIcon from '@mui/icons-material/Search';
-import SyncIcon from '@mui/icons-material/Sync';
-import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
+import ClearIcon from '@mui/icons-material/Clear';
 
-const EditableCell = ({ value, onChange, align = 'left', sx = {}, colSpan }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [tempValue, setTempValue] = useState(value || '');
+// const API_URL = "http://localhost:5000"
+const API_URL = "https://exportd-d-api.onrender.com";
 
-    React.useEffect(() => { setTempValue(value || ''); }, [value]);
+const buildSizes = () => {
+  const s = [];
+  for (let i = 3; i <= 18; i += 0.5) s.push(i);
+  return s;
+};
+const sizes = buildSizes();
+const sizeToCol = (size) => `s${size.toString().replace('.', '_')}`;
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') { onChange(tempValue); setIsEditing(false); }
-        else if (e.key === 'Escape') { setTempValue(value || ''); setIsEditing(false); }
-    };
+const groupByDate = (rows) => {
+  const map = new Map();
+  rows.forEach(row => {
+    const d = row.export_date;
+    if (!map.has(d)) map.set(d, []);
+    map.get(d).push(row);
+  });
+  const result = [];
+  map.forEach((rows, date) => result.push({ date, rows }));
+  return result;
+};
 
-    if (isEditing) {
-        return (
-            <TableCell align={align} colSpan={colSpan} sx={{ ...sx, p: '4px' }}>
-                <TextField
-                    autoFocus size="small" variant="outlined"
-                    value={tempValue}
-                    onChange={(e) => setTempValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onBlur={() => { onChange(tempValue); setIsEditing(false); }}
-                    InputProps={{ sx: { fontSize: '0.85rem', height: 26, borderRadius: '4px' } }}
-                    inputProps={{ style: { textAlign: align === 'center' ? 'center' : 'left', padding: '0 8px' } }}
-                    sx={{ width: '100%', minWidth: 40 }}
-                />
-            </TableCell>
-        );
-    }
-
-    return (
-        <TableCell
-            align={align} colSpan={colSpan}
-            sx={{
-                ...sx,
-                cursor: 'text',
-                transition: 'background-color 0.15s ease',
-                '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.08)' }
-            }}
-            onClick={() => setIsEditing(true)}
-        >
-            {value}
-        </TableCell>
-    );
+const getStatus = (accumulated, total, remaining) => {
+  const acc = parseFloat(accumulated) || 0;
+  const rem = parseFloat(remaining) ?? null;
+  if (acc === 0) return { label: 'Chưa giao', color: '#64748b', bg: '#f1f5f9' };
+  if (rem !== null && rem <= 0) return { label: 'Hoàn tất', color: '#16a34a', bg: '#dcfce7' };
+  return { label: 'Còn nợ', color: '#b45309', bg: '#fef9c3' };
 };
 
 const RemainingStock = () => {
-    const sizes = [];
-    for (let i = 3; i <= 18; i += 0.5) sizes.push(i);
+  const [tableData, setTableData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-    const initialData = [
-        {
-            maDon: 'AH2602-M25',
-            rows: [{ stt: 1, dotGh: 'DHD3', ngayGh: '02/02/2026', tongCan: 670, tichLuy: 124, conLai: 546, sizes: { '3.5': 25, '4': 22, '4.5': 29, '5': 20, '5.5': 37, '6': 29, '6.5': 31, '7': 34, '7.5': 32, '8': 47, '8.5': 32, '9': 49, '9.5': 32, '10': 41, '10.5': 30, '11': 5, '11.5': 11, '12': 29, '12.5': 10, '13': 4 } }]
-        },
-        {
-            maDon: 'AH2602-N34',
-            rows: [{ stt: 1, dotGh: 'DHD3', ngayGh: '29/01/2026', tongCan: 205, tichLuy: 54, conLai: 151, sizes: { '7.5': 40, '9': 9, '10': 18, '10.5': 98, '12': 3 } }]
-        },
-        {
-            maDon: 'AH2603-E96',
-            rows: [{ stt: 1, dotGh: 'DHD3', ngayGh: '21/01/2026', tongCan: 480, tichLuy: 30, conLai: 450, sizes: { '10.5': 450 } }]
-        },
-        {
-            maDon: 'AH2602-G64',
-            rows: [{ stt: 1, dotGh: 'DHD3', ngayGh: '23/01/2026', tongCan: 948, tichLuy: 653, conLai: 295, sizes: { '3': 28, '3.5': 38, '4': 55, '4.5': 39, '5': 31, '5.5': 104 } }]
-        },
-        {
-            maDon: 'AH2602-M65',
-            rows: [{ stt: 1, dotGh: 'DHD3', ngayGh: '30/01/2026', tongCan: 629, tichLuy: 447, conLai: 182, sizes: { '3': 3, '3.5': 26, '4': 28, '4.5': 32, '5': 24, '6.5': 56, '7': 13 } }]
-        },
-        {
-            maDon: 'AH2602-G67',
-            rows: [{ stt: 1, dotGh: 'DHD3', ngayGh: '30/01/2026', tongCan: 514, tichLuy: 513, conLai: 1, sizes: { '3': 1, '3.5': 1, '5': 1 } }]
-        },
-        {
-            maDon: 'AH2604-556',
-            rows: [{ stt: 1, dotGh: 'DHD3', ngayGh: '31/01/2026', tongCan: 667, tichLuy: 428, conLai: 239, sizes: { '6.5': 6, '7.5': 17, '8.5': 12, '10': 191, '12': 7, '12.5': 2 } }]
-        },
-        {
-            maDon: 'AH2603-C39',
-            rows: [{ stt: 1, dotGh: 'DHD3', ngayGh: '02/02/2026', tongCan: 232, tichLuy: 231, conLai: 1, sizes: { '4.5': 1 } }]
-        },
-        {
-            maDon: 'AH2603-C34',
-            rows: [{ stt: 1, dotGh: 'DHD3', ngayGh: '03/02/2026', tongCan: 323, tichLuy: 314, conLai: 9, sizes: { '7.5': 10 } }]
-        }
-    ];
+  const isDateSearch = (s) => /^\d{1,2}\/\d{1,2}(\/\d{2,4})?$/.test(s.trim());
 
-    const [dataGroups, setDataGroups] = useState(initialData);
+  const fetchData = useCallback(async (search) => {
+    setLoading(true);
+    let url = `${API_URL}/api/remaining-stock`;
+    const trimmed = search.trim();
+    if (trimmed) {
+      if (isDateSearch(trimmed)) {
+        url += `?date=${encodeURIComponent(trimmed)}`;
+      } else {
+        url += `?ry_number=${encodeURIComponent(trimmed)}`;
+      }
+    }
 
-    const handleUpdate = (groupIdx, rowIdx, field, newValue) => {
-        const newData = [...dataGroups];
-        newData[groupIdx].rows[rowIdx][field] = ['tongCan', 'tichLuy', 'conLai'].includes(field)
-            ? (newValue !== '' ? Number(newValue) : '')
-            : newValue;
-        setDataGroups(newData);
-    };
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Kết nối thất bại!');
+      const data = await res.json();
+      setTableData(Array.isArray(data) ? groupByDate(data) : []);
+    } catch (err) {
+      console.error('Fetch error:', err.message);
+      setTableData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    const handleUpdateSize = (groupIdx, rowIdx, sizeStr, newValue) => {
-        const newData = [...dataGroups];
-        if (newValue === '') delete newData[groupIdx].rows[rowIdx].sizes[sizeStr];
-        else newData[groupIdx].rows[rowIdx].sizes[sizeStr] = Number(newValue);
-        setDataGroups(newData);
-    };
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-    const cellStyle = { py: 1.2, px: 1, borderBottom: '1px solid #f1f5f9', borderRight: '1px solid #f1f5f9', fontSize: '0.85rem' };
-    const headerCellStyle = { ...cellStyle, color: '#475569', fontWeight: 600, bgcolor: '#ffffff' };
+  useEffect(() => {
+    fetchData(debouncedSearch);
+  }, [debouncedSearch, fetchData]);
 
-    return (
-        <Box sx={{ p: { xs: 2, md: 3 }, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Paper elevation={0} sx={{
-                borderRadius: '8px',
-                backgroundColor: '#ffffff',
-                display: 'flex',
-                flexDirection: 'column',
-                flexGrow: 1,
-                overflow: 'hidden',
-                border: '1px solid #e2e8f0'
-            }}>
-                <Box sx={{ p: 3, pb: 2 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                        <Box>
-                            <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                                THEO DÕI XUẤT NHẬP KHO — HÀNG CÒN NỢ
-                            </Typography>
-                            <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', mt: 0.5, fontWeight: 500 }}>
-                                Đơn vị chuyển: DD (Long An)
-                            </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{ textAlign: 'right', mr: 1 }}>
-                                <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>Tổng còn lại</Typography>
-                                <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', mt: 0.5, fontWeight: 500 }}>14617</Typography>
-                            </Box>
-                        </Box>
-                    </Box>
+  return (
+    <Box sx={{ p: { xs: 2, md: 3 }, width: '100%', height: '100%' }}>
+      <Paper elevation={0} sx={{
+        borderRadius: '12px',
+        bgcolor: '#ffffff',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        border: '1px solid #e2e8f0',
+        overflow: 'hidden'
+      }}>
+        <Box sx={{ p: 2.5, pb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+            <Box>
+              <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                CHI TIẾT HÀNG CÒN NỢ (REMAINING STOCK)
+              </Typography>
+              <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', mt: 0.4, fontWeight: 500 }}>
+                Đơn vị chuyển: DD (Long An)
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>Đơn vị lãnh</Typography>
+              <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', mt: 0.5, fontWeight: 500 }}>Công Ty Lạc Tỷ</Typography>
+            </Box>
+          </Box>
 
-                    <Box sx={{ width: '380px', mt: 1 }}>
-                        <TextField
-                            fullWidth size="small" placeholder="Search..."
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon sx={{ color: '#94a3b8', fontSize: 20 }} />
-                                    </InputAdornment>
-                                ),
-                            }}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '8px', backgroundColor: '#ffffff',
-                                    fontSize: '0.9rem', color: '#334155',
-                                    '& fieldset': { borderColor: '#c7d2fe' },
-                                    '&:hover fieldset': { borderColor: '#a5b4fc' },
-                                    '&.Mui-focused fieldset': { borderColor: '#818cf8' },
-                                }
-                            }}
-                        />
-                    </Box>
-                </Box>
-
-                <Box sx={{ flexGrow: 1, borderTop: '1px solid #e2e8f0', width: '100%', overflowX: 'auto' }}>
-                    <TableContainer sx={{ minWidth: 2400 }}>
-                        <Table size="small" sx={{ borderCollapse: 'collapse' }}>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell align="center" sx={{ ...headerCellStyle, width: 45 }}>STT</TableCell>
-                                    <TableCell align="center" sx={{ ...headerCellStyle, minWidth: 80 }}>Đợt GH</TableCell>
-                                    <TableCell align="center" sx={{ ...headerCellStyle, minWidth: 100 }}>Ngày GH</TableCell>
-                                    <TableCell sx={{ ...headerCellStyle, minWidth: 120 }}>Mã Đơn Hàng</TableCell>
-                                    <TableCell align="center" sx={{ ...headerCellStyle, minWidth: 80 }}>Tổng Cần</TableCell>
-                                    <TableCell align="center" sx={{ ...headerCellStyle, minWidth: 80 }}>Tích Lũy</TableCell>
-                                    <TableCell align="center" sx={{ ...headerCellStyle, minWidth: 80 }}>Còn Lại</TableCell>
-                                    {sizes.map(s => (
-                                        <TableCell key={s} align="center" sx={{ ...headerCellStyle, width: 40, p: 0.5 }}>{s}</TableCell>
-                                    ))}
-                                    <TableCell align="left" sx={{ ...headerCellStyle, minWidth: 100 }}>Trạng thái</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {dataGroups.map((group, groupIdx) => {
-                                    const totals = group.rows.reduce((acc, row) => {
-                                        acc.tongCan += row.tongCan;
-                                        acc.tichLuy += row.tichLuy;
-                                        acc.conLai += row.conLai;
-                                        Object.keys(row.sizes).forEach(s => {
-                                            acc.sizes[s] = (acc.sizes[s] || 0) + row.sizes[s];
-                                        });
-                                        return acc;
-                                    }, { tongCan: 0, tichLuy: 0, conLai: 0, sizes: {} });
-
-                                    return (
-                                        <React.Fragment key={groupIdx}>
-                                            {group.rows.map((row, rowIdx) => (
-                                                <TableRow key={`row-${groupIdx}-${rowIdx}`} sx={{ '& td': { borderBottom: '1px solid #f8fafc' } }}>
-                                                    <TableCell align="center" sx={{ ...cellStyle, color: '#94a3b8' }}>{row.stt}</TableCell>
-                                                    <EditableCell value={row.dotGh} align="center" onChange={(v) => handleUpdate(groupIdx, rowIdx, 'dotGh', v)} sx={{ ...cellStyle, color: '#475569' }} />
-                                                    <EditableCell value={row.ngayGh} align="center" onChange={(v) => handleUpdate(groupIdx, rowIdx, 'ngayGh', v)} sx={{ ...cellStyle, color: '#475569' }} />
-                                                    <EditableCell value={row.maDon} onChange={(v) => handleUpdate(groupIdx, rowIdx, 'maDon', v)} sx={{ ...cellStyle, fontWeight: 600, color: '#1e293b' }} />
-                                                    <EditableCell value={row.tongCan} align="center" onChange={(v) => handleUpdate(groupIdx, rowIdx, 'tongCan', v)} sx={{ ...cellStyle, color: '#64748b' }} />
-                                                    <EditableCell value={row.tichLuy} align="center" onChange={(v) => handleUpdate(groupIdx, rowIdx, 'tichLuy', v)} sx={{ ...cellStyle, color: '#8b5cf6', fontWeight: 500 }} />
-                                                    <EditableCell value={row.conLai} align="center" onChange={(v) => handleUpdate(groupIdx, rowIdx, 'conLai', v)} sx={{ ...cellStyle, color: '#334155', fontWeight: 600 }} />
-                                                    {sizes.map(s => (
-                                                        <EditableCell key={s} value={row.sizes[s] || ''} align="center" onChange={(v) => handleUpdateSize(groupIdx, rowIdx, s.toString(), v)} sx={{ ...cellStyle, color: '#1e293b', fontWeight: 600 }} />
-                                                    ))}
-                                                    <TableCell sx={{ ...cellStyle }} />
-                                                </TableRow>
-                                            ))}
-
-                                            {/* Total Row */}
-                                            <TableRow sx={{ bgcolor: '#fbfcfd' }}>
-                                                <TableCell colSpan={2} sx={{ ...cellStyle, borderRight: 'none' }} />
-                                                <TableCell colSpan={2} align="right" sx={{ ...cellStyle, fontWeight: 700, color: '#1e293b', pr: 2 }}>
-                                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                                                        <Typography sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Total:</Typography>
-                                                        <Typography sx={{ fontWeight: 700, fontSize: '0.85rem' }}>{group.maDon}</Typography>
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell align="center" sx={{ ...cellStyle, fontWeight: 700, color: '#475569' }}>{totals.tongCan}</TableCell>
-                                                <TableCell align="center" sx={{ ...cellStyle, fontWeight: 700, color: '#8b5cf6' }}>{totals.tichLuy}</TableCell>
-                                                <TableCell align="center" sx={{ ...cellStyle, fontWeight: 800, color: '#1e293b' }}>{totals.conLai}</TableCell>
-                                                {sizes.map(s => (
-                                                    <TableCell key={s} align="center" sx={{ ...cellStyle, color: totals.sizes[s] ? '#1e293b' : '#cbd5e1', fontWeight: 700 }}>
-                                                        {totals.sizes[s] || '—'}
-                                                    </TableCell>
-                                                ))}
-                                                <TableCell sx={{ ...cellStyle, color: '#64748b' }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                                                        <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
-                                                        <Typography sx={{ fontSize: '0.8rem' }}>Còn {totals.conLai}</Typography>
-                                                    </Box>
-                                                </TableCell>
-                                            </TableRow>
-                                        </React.Fragment>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Box>
-            </Paper>
+          <Box sx={{ width: '360px', mt: 1 }}>
+            <TextField
+              placeholder="Tìm ngày (dd/mm) hoặc mã đơn hàng..."
+              variant="outlined"
+              size="small"
+              fullWidth
+              autoComplete="off"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: '#94a3b8', fontSize: '1.2rem' }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {loading ? (
+                      <CircularProgress size={16} sx={{ color: '#94a3b8', mr: 1 }} />
+                    ) : searchTerm && (
+                      <IconButton size="small" onClick={() => setSearchTerm('')} edge="end">
+                        <ClearIcon sx={{ fontSize: '1.1rem', color: '#94a3b8' }} />
+                      </IconButton>
+                    )}
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  bgcolor: '#ffffff',
+                  '& fieldset': { borderColor: '#e2e8f0' },
+                  '&:hover fieldset': { borderColor: '#cbd5e1' },
+                  '&.Mui-focused fieldset': { borderColor: '#1976d2' },
+                  '& input:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 1000px #ffffff inset !important',
+                    WebkitTextFillColor: '#1e293b !important',
+                  }
+                }
+              }}
+            />
+          </Box>
         </Box>
-    );
+
+        <Box sx={{ flexGrow: 1, borderTop: '1px solid #e2e8f0', width: '100%', height: '100%' }}>
+          <TableContainer sx={{ width: '100%', height: '100%', overflow: 'auto', position: 'relative' }}>
+            <Table size="small" sx={{
+              minWidth: 2800,
+              '& th, & td': { border: '1px solid #f1f5f9', py: 1.1, px: 1, textAlign: 'center' },
+              borderCollapse: 'separate',
+              borderSpacing: 0
+            }}>
+              <TableHead>
+                <TableRow>
+                  {['STT', 'Đơn Hàng', 'Article', 'Model Name', 'Tổng Cần Giao', 'Tổng Tích Lũy', 'Tổng SL Trong Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+                    <TableCell key={h} align="center" sx={{
+                      color: i >= 4 && i <= 7 ? '#1976d2' : '#475569',
+                      bgcolor: i >= 4 && i <= 7 ? '#f1f7ff' : '#f8fafc',
+                      fontWeight: 700, fontSize: '0.8rem', whiteSpace: 'nowrap',
+                      minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 3 ? 150 : 120,
+                      maxWidth: i === 0 ? 50 : i === 1 ? 160 : 'none',
+                      position: 'sticky !important',
+                      top: 0,
+                      left: i === 0 ? 0 : i === 1 ? 50 : 'auto',
+                      zIndex: i <= 1 ? 12 : 2,
+                      borderRight: i <= 1 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
+                      boxShadow: i === 1 ? '2px 0 5px -1px rgba(0,0,0,0.1)' : 'none'
+                    }}>{h}</TableCell>
+                  ))}
+                  {sizes.map(size => (
+                    <TableCell key={size} sx={{
+                      color: '#475569', fontWeight: 700, fontSize: '0.82rem', bgcolor: '#f8fafc',
+                      minWidth: 40, position: 'sticky', top: 0, zIndex: 1
+                    }}>{size}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {tableData.map((group, groupIdx) => (
+                  <React.Fragment key={groupIdx}>
+                    <TableRow>
+                      <TableCell colSpan={9 + sizes.length} sx={{ bgcolor: '#fff7ed', py: 0.8, borderBottom: '2px solid #ffedd5', textAlign: 'left !important', p: 0 }}>
+                        <Box sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          position: 'sticky',
+                          left: 50,
+                          py: 0.8,
+                          px: 2
+                        }}>
+                          <CalendarTodayOutlinedIcon sx={{ fontSize: '1rem', color: '#c2410c' }} />
+                          <Typography sx={{ fontWeight: 700, color: '#c2410c', fontSize: '0.9rem' }}>Ngày : {group.date}</Typography>
+                          <Typography sx={{ fontSize: '0.8rem', color: '#9a3412', ml: 1, fontWeight: 500 }}>
+                            — {group.rows.length} Mã đơn hàng
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+
+                    {group.rows.map((row, rowIdx) => {
+                      const status = getStatus(row.accumulated_total, row.total_quantity, row.remaining_quantity);
+                      return (
+                        <TableRow key={row.id} hover sx={{ bgcolor: '#ffffff' }}>
+                          <TableCell align="center" sx={{
+                            fontWeight: 500, color: '#94a3b8', fontSize: '0.82rem',
+                            position: 'sticky !important', left: '0 !important', bgcolor: '#ffffff', zIndex: 1,
+                            borderRight: '1px solid #f1f5f9'
+                          }}>{rowIdx + 1}</TableCell>
+                          <TableCell align="center" sx={{
+                            fontWeight: 800, color: '#1e293b',
+                            position: 'sticky !important', left: '50px !important', bgcolor: '#ffffff', zIndex: 1,
+                            borderRight: '2px solid #e2e8f0',
+                            boxShadow: '2px 0 5px -1px rgba(0,0,0,0.1)'
+                          }}>{row.ry_number}</TableCell>
+                          <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.article || '—'}</TableCell>
+                          <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.model_name || '—'}</TableCell>
+                          <TableCell sx={{ color: '#1976d2', fontWeight: 600, fontSize: '0.85rem' }}>{row.total_quantity ?? '—'}</TableCell>
+                          <TableCell sx={{ color: '#6366f1', fontWeight: 600, fontSize: '0.85rem' }}>{row.accumulated_total ?? '—'}</TableCell>
+                          <TableCell sx={{ color: '#1976d2', fontWeight: 600, fontSize: '0.85rem' }}>{row.shipped_quantity ?? '0'}</TableCell>
+                          <TableCell sx={{ color: '#ea580c', fontWeight: 800, fontSize: '0.85rem', bgcolor: '#fffaf5' }}>{row.remaining_quantity ?? '—'}</TableCell>
+                          <TableCell sx={{ minWidth: 100 }}>
+                            <Chip
+                              label={status.label}
+                              size="small"
+                              sx={{
+                                bgcolor: status.bg,
+                                color: status.color,
+                                fontWeight: 700,
+                                fontSize: '0.7rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${status.color}20`
+                              }}
+                            />
+                          </TableCell>
+
+                          {sizes.map(size => {
+                            const val = row[sizeToCol(size)];
+                            const isEmpty = val === 0 || val === '0' || !val;
+                            return (
+                              <TableCell
+                                key={size}
+                                sx={{
+                                  color: isEmpty ? '#cbd5e1' : '#ef4444', // Màu đỏ cho số lượng nợ
+                                  fontSize: '0.85rem',
+                                  fontWeight: isEmpty ? 400 : 700,
+                                  bgcolor: isEmpty ? 'transparent' : '#fff5f5'
+                                }}
+                              >
+                                {isEmpty ? '—' : val}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Paper>
+    </Box>
+  );
 };
 
 export default RemainingStock;
