@@ -5,54 +5,9 @@ import {
     InputAdornment, IconButton
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import SyncIcon from '@mui/icons-material/Sync';
 import ClearIcon from '@mui/icons-material/Clear';
 
-const EditableCell = ({ value, onChange, align = 'left', sx = {}, colSpan }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [tempValue, setTempValue] = useState(value || '');
-
-    React.useEffect(() => { setTempValue(value || ''); }, [value]);
-
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') { onChange(tempValue); setIsEditing(false); }
-        else if (e.key === 'Escape') { setTempValue(value || ''); setIsEditing(false); }
-    };
-
-    if (isEditing) {
-        return (
-            <TableCell align={align} colSpan={colSpan} sx={{ ...sx, p: '4px' }}>
-                <TextField
-                    autoFocus size="small" variant="outlined"
-                    value={tempValue}
-                    onChange={(e) => setTempValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onBlur={() => { onChange(tempValue); setIsEditing(false); }}
-                    InputProps={{ sx: { fontSize: '0.85rem', height: 26, borderRadius: '4px', bgcolor: '#ffffff' } }}
-                    inputProps={{ style: { textAlign: align === 'center' ? 'center' : 'left', padding: '0 8px' } }}
-                    sx={{ width: '100%', minWidth: 40 }}
-                />
-            </TableCell>
-        );
-    }
-
-    return (
-        <TableCell
-            align={align} colSpan={colSpan}
-            sx={{
-                ...sx,
-                cursor: 'text',
-                borderBottom: '1px solid #e2e8f0',
-                borderRight: '1px solid #e2e8f0',
-                transition: 'background-color 0.1s ease',
-                '&:hover': { filter: 'brightness(0.95)' }
-            }}
-            onClick={() => setIsEditing(true)}
-        >
-            {value}
-        </TableCell>
-    );
-};
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const ClientOrders = () => {
     const sizes = [];
@@ -65,7 +20,7 @@ const ClientOrders = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('https://exportd-d-api.onrender.com/api/orders');
+                const response = await fetch(`${API_URL}/api/orders`);
                 const data = await response.json();
 
                 if (!Array.isArray(data)) { setTableData([]); return; }
@@ -106,22 +61,7 @@ const ClientOrders = () => {
         }
     }, [searchQuery, tableData]);
 
-    const handleUpdate = (rowIdx, field, newValue) => {
-        const newData = [...tableData];
-        newData[rowIdx][field] = field === 'total'
-            ? (newValue !== '' ? Number(newValue) : '')
-            : newValue;
-        setTableData(newData);
-    };
-
-    const handleUpdateSize = (rowIdx, sizeStr, newValue) => {
-        const newData = [...tableData];
-        if (newValue === '') delete newData[rowIdx].sizes[sizeStr];
-        else newData[rowIdx].sizes[sizeStr] = Number(newValue);
-        setTableData(newData);
-    };
-
-    const cellStyle = { color: '#1e293b', fontSize: '0.85rem' };
+    const cellStyle = { color: '#1e293b', fontSize: '0.85rem', height: 38, borderRight: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' };
 
     return (
         <Box sx={{ p: { xs: 2, md: 3 }, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -185,54 +125,58 @@ const ClientOrders = () => {
 
                 <Box sx={{ flexGrow: 1, borderTop: '1px solid #e2e8f0', width: '100%', overflow: 'auto', bgcolor: '#f8fafc' }}>
                     <TableContainer sx={{ minWidth: 2400, height: '100%' }}>
-                        <Table size="small" sx={{ '& th, & td': { border: '1px solid #f1f5f9', py: 1.2, px: 1 } }}>
+                        <Table stickyHeader size="small" sx={{ 
+                            '& th, & td': { p: 1 },
+                            borderCollapse: 'separate'
+                        }}>
                             <TableHead>
-                                <TableRow sx={{ bgcolor: '#f8fafc' }}>
+                                <TableRow>
                                     {['STT', 'Đơn Hàng', 'Article', 'Model Name', 'Total', 'Đợt giao hàng'].map((h, i) => (
                                         <TableCell key={h} align="center" sx={{
                                             color: '#475569', fontWeight: 600, fontSize: '0.85rem',
-                                            minWidth: i === 0 ? 50 : i === 3 ? 140 : i === 2 ? 80 : 120
+                                            minWidth: i === 0 ? 50 : i === 3 ? 140 : i === 2 ? 80 : 120,
+                                            backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0'
                                         }}>{h}</TableCell>
                                     ))}
                                     {sizes.map(s => (
-                                        <TableCell key={s} align="center" sx={{ color: '#475569', fontWeight: 600, fontSize: '0.85rem', minWidth: 40 }}>{s}</TableCell>
+                                        <TableCell key={s} align="center" sx={{ 
+                                            color: '#475569', fontWeight: 600, fontSize: '0.85rem', 
+                                            minWidth: 40, backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0'
+                                        }}>{s}</TableCell>
                                     ))}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {filteredData.map((row, index) => {
-                                    const actualIdx = tableData.findIndex(item => item.id === row.id);
-                                    return (
-                                        <TableRow key={row.id}>
-                                            <TableCell align="center" sx={{ ...cellStyle, fontWeight: 500, color: '#64748b' }}>
-                                                {index + 1}
-                                            </TableCell>
-                                            <EditableCell value={row.donHang} align="center" onChange={(v) => handleUpdate(actualIdx, 'donHang', v)} sx={{ ...cellStyle, fontWeight: 600 }} />
-                                            <EditableCell value={row.article} align="center" onChange={(v) => handleUpdate(actualIdx, 'article', v)} sx={cellStyle} />
-                                            <EditableCell value={row.modelName} align="center" onChange={(v) => handleUpdate(actualIdx, 'modelName', v)} sx={{ ...cellStyle, fontWeight: 600 }} />
-                                            <EditableCell value={row.total} align="center" onChange={(v) => handleUpdate(actualIdx, 'total', v)} sx={{ ...cellStyle, fontWeight: 700 }} />
-                                            <EditableCell value={row.dotGiao} align="center" onChange={(v) => handleUpdate(actualIdx, 'dotGiao', v)} sx={cellStyle} />
-                                            {sizes.map(s => {
-                                                const val = row.sizes && row.sizes[s] !== undefined ? row.sizes[s] : '';
-                                                const isEmpty = val === '' || Number(val) === 0;
-                                                return (
-                                                    <EditableCell
-                                                        key={s}
-                                                        value={isEmpty ? '' : val}
-                                                        align="center"
-                                                        onChange={(v) => handleUpdateSize(actualIdx, s.toString(), v)}
-                                                        sx={{
-                                                            color: !isEmpty ? '#0f172a' : '#94a3b8',
-                                                            fontSize: '0.85rem',
-                                                            fontWeight: !isEmpty ? 600 : 400,
-                                                            bgcolor: !isEmpty ? '#ffffff' : '#e2e8f0'
-                                                        }}
-                                                    />
-                                                );
-                                            })}
-                                        </TableRow>
-                                    );
-                                })}
+                                {filteredData.map((row, index) => (
+                                    <TableRow key={row.id}>
+                                        <TableCell align="center" sx={{ ...cellStyle, fontWeight: 500, color: '#64748b' }}>
+                                            {index + 1}
+                                        </TableCell>
+                                        <TableCell align="center" sx={{ ...cellStyle, fontWeight: 600 }}>{row.donHang}</TableCell>
+                                        <TableCell align="center" sx={cellStyle}>{row.article}</TableCell>
+                                        <TableCell align="center" sx={{ ...cellStyle, fontWeight: 600 }}>{row.modelName}</TableCell>
+                                        <TableCell align="center" sx={{ ...cellStyle, fontWeight: 700 }}>{row.total}</TableCell>
+                                        <TableCell align="center" sx={cellStyle}>{row.dotGiao}</TableCell>
+                                        {sizes.map(s => {
+                                            const val = row.sizes && row.sizes[s] !== undefined ? row.sizes[s] : '';
+                                            const isEmpty = val === '' || Number(val) === 0;
+                                            return (
+                                                <TableCell
+                                                    key={s}
+                                                    align="center"
+                                                    sx={{
+                                                        ...cellStyle,
+                                                        color: !isEmpty ? '#0f172a' : '#94a3b8',
+                                                        fontWeight: !isEmpty ? 600 : 400,
+                                                        bgcolor: !isEmpty ? '#ffffff' : '#e2e8f0'
+                                                    }}
+                                                >
+                                                    {isEmpty ? '' : val}
+                                                </TableCell>
+                                            );
+                                        })}
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
