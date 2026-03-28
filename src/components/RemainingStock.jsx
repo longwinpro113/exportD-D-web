@@ -152,8 +152,8 @@ const RemainingStock = () => {
           </Box>
         </Box>
 
-        <Box sx={{ flexGrow: 1, borderTop: '1px solid #e2e8f0', width: '100%', height: '100%' }}>
-          <TableContainer sx={{ width: '100%', height: '100%', overflow: 'auto', position: 'relative' }}>
+        <Box sx={{ flex: 1, borderTop: '1px solid #e2e8f0', width: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+          <TableContainer sx={{ width: '100%', flex: 1, overflow: 'auto', position: 'relative' }}>
             <Table size="small" sx={{
               minWidth: 2800,
               '& th, & td': { border: '1px solid #f1f5f9', py: 1.1, px: 1, textAlign: 'center' },
