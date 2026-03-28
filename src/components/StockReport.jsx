@@ -12,8 +12,6 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
-import { toast } from 'react-toastify';
-
 const API_URL = "https://exportd-d-api.onrender.com";
 
 const buildSizes = () => {
@@ -227,7 +225,7 @@ const StockReport = () => {
   const [editRow, setEditRow] = useState(null);
   const [deleteRow, setDeleteRow] = useState(null);
 
-  const isDateSearch = (s) => /^\d{2}\/\d{2}\/\d{4}$/.test(s.trim());
+  const isDateSearch = (s) => /^\d{1,2}\/\d{1,2}(\/\d{2,4})?$/.test(s.trim());
 
   const fetchData = useCallback(async (search) => {
     setLoading(true);
@@ -242,15 +240,6 @@ const StockReport = () => {
     const fetchPromise = fetch(url).then(async (res) => {
       if (!res.ok) throw new Error('Kết nối thất bại!');
       return res.json();
-    });
-
-    toast.promise(fetchPromise, {
-      pending: 'Đang kết nối máy chủ...',
-      success: 'Tải dữ liệu thành công!',
-      error: 'Lỗi kết nối máy chủ!'
-    }, {
-      position: 'bottom-right',
-      toastId: 'api-connection'
     });
 
     try {
