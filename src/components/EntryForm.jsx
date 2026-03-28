@@ -120,11 +120,11 @@ const EntryForm = () => {
                 throw new Error(err.error || 'Save failed');
             }
 
-            setSnackbar({ open: true, message: 'Export saved successfully.', severity: 'success' });
+            setSnackbar({ open: true, message: 'Lưu thành công.', severity: 'success' });
             handleReset();
         } catch (err) {
             console.error('Save error:', err.message);
-            setSnackbar({ open: true, message: `Save failed: ${err.message}`, severity: 'error' });
+            setSnackbar({ open: true, message: `Lưu thất bại: ${err.message}`, severity: 'error' });
         } finally {
             setSaving(false);
         }
