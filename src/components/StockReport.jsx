@@ -38,11 +38,9 @@ const groupByDate = (rows) => {
 };
 
 const getStatus = (accumulated, total, remaining) => {
-  const acc = parseFloat(accumulated) || 0;
   const rem = parseFloat(remaining) ?? null;
-  if (acc === 0) return { label: 'Not yet', color: '#64748b', bg: '#f1f5f9' };
-  if (rem !== null && rem <= 0) return { label: 'Complete', color: '#16a34a', bg: '#dcfce7' };
-  return { label: 'In Progress', color: '#b45309', bg: '#fef9c3' };
+  if (rem !== null && rem <= 0) return { label: 'Ok', color: '#16a34a', bg: '#dcfce7' };
+  return { label: 'Not Ok', color: '#dc2626', bg: '#fee2e2' };
 };
 
 // ─── Edit Dialog ─────────────────────────────────────────────────────────────
@@ -354,7 +352,7 @@ const StockReport = () => {
                             color: i >= 4 && i <= 7 ? '#1976d2' : '#475569',
                             bgcolor: i >= 4 && i <= 7 ? '#f1f7ff' : '#f8fafc',
                             fontWeight: 700, fontSize: '0.8rem', whiteSpace: 'nowrap',
-                            minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 3 ? 150 : 120,
+                            minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 3 ? 150 : i === 8 ? 80 : 120,
                             maxWidth: i === 0 ? 50 : i === 1 ? 160 : 'none',
                             position: 'sticky !important',
                             top: 0,
@@ -403,13 +401,17 @@ const StockReport = () => {
                       const status = getStatus(row.accumulated_total, row.total_quantity, row.remaining_quantity);
                       const remVal = parseFloat(row.remaining_quantity) || 0;
                       return (
-                        <TableRow key={row.id} hover sx={{ bgcolor: '#ffffff' }}>
-                          <TableCell align="center" sx={{ 
+                        <TableRow key={row.id} hover sx={{ 
+                          bgcolor: '#ffffff',
+                          '&:hover td': { bgcolor: '#f8fafc' },
+                          '&:hover td.sticky-cell': { bgcolor: '#f8fafc !important' }
+                        }}>
+                          <TableCell align="center" className="sticky-cell" sx={{ 
                                                 fontWeight: 500, color: '#94a3b8', fontSize: '0.82rem',
                                                 position: 'sticky !important', left: '0 !important', bgcolor: '#ffffff', zIndex: 1,
                                                 borderRight: '1px solid #f1f5f9'
                                             }}>{rowIdx + 1}</TableCell>
-                          <TableCell align="center" sx={{ 
+                          <TableCell align="center" className="sticky-cell" sx={{ 
                                                 fontWeight: 800, color: '#1e293b',
                                                 position: 'sticky !important', left: '50px !important', bgcolor: '#ffffff', zIndex: 1,
                                                 borderRight: '2px solid #e2e8f0',
@@ -417,22 +419,22 @@ const StockReport = () => {
                                             }}>{row.ry_number}</TableCell>
                           <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.article || '—'}</TableCell>
                           <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.model_name || '—'}</TableCell>
-                          <TableCell sx={{ color: '#1976d2', fontWeight: 700, fontSize: '0.85rem', bgcolor: '#f8fbff' }}>{row.total_quantity ?? '—'}</TableCell>
-                          <TableCell sx={{ color: '#7c3aed', fontWeight: 700, fontSize: '0.85rem', bgcolor: '#faf8ff' }}>{row.accumulated_total ?? 0}</TableCell>
-                          <TableCell sx={{ color: '#0369a1', fontWeight: 600, fontSize: '0.85rem', bgcolor: '#f8fcff' }}>{row.shipped_quantity ?? 0}</TableCell>
+                          <TableCell sx={{ color: '#1976d2', fontWeight: 700, fontSize: '0.85rem', bgcolor: '#f8fbff !important' }}>{row.total_quantity ?? '—'}</TableCell>
+                          <TableCell sx={{ color: '#7c3aed', fontWeight: 700, fontSize: '0.85rem', bgcolor: '#faf8ff !important' }}>{row.accumulated_total ?? 0}</TableCell>
+                          <TableCell sx={{ color: '#0369a1', fontWeight: 600, fontSize: '0.85rem', bgcolor: '#f8fcff !important' }}>{row.shipped_quantity ?? 0}</TableCell>
                           <TableCell sx={{
                             fontWeight: 600, fontSize: '0.85rem',
                             color: remVal < 0 ? '#ef4444' : remVal === 0 ? '#16a34a' : '#f59e0b'
                           }}>
                             {row.remaining_quantity ?? '—'}
                           </TableCell>
-                          <TableCell sx={{ px: 0.5 }}>
-                            <Chip label={status.label} size="small" sx={{
-                              fontSize: '0.75rem', fontWeight: 600,
-                              color: status.color, bgcolor: status.bg,
-                              border: `1px solid ${status.color}30`,
-                              height: 22, borderRadius: '6px'
-                            }} />
+                          <TableCell sx={{ 
+                            bgcolor: `${status.bg} !important`, 
+                            color: `${status.color} !important`,
+                            fontWeight: 800, 
+                            fontSize: '0.8rem'
+                          }}>
+                            {status.label}
                           </TableCell>
 
                           {sizes.map(size => {

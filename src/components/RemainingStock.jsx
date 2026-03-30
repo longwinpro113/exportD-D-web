@@ -32,11 +32,9 @@ const groupByDate = (rows) => {
 };
 
 const getStatus = (accumulated, total, remaining) => {
-  const acc = parseFloat(accumulated) || 0;
   const rem = parseFloat(remaining) ?? null;
-  if (acc === 0) return { label: 'Chưa giao', color: '#64748b', bg: '#f1f5f9' };
-  if (rem !== null && rem <= 0) return { label: 'Hoàn tất', color: '#16a34a', bg: '#dcfce7' };
-  return { label: 'Còn nợ', color: '#b45309', bg: '#fef9c3' };
+  if (rem !== null && rem <= 0) return { label: 'Ok', color: '#16a34a', bg: '#dcfce7' };
+  return { label: 'Not Ok', color: '#dc2626', bg: '#fee2e2' };
 };
 
 const RemainingStock = () => {
@@ -167,7 +165,7 @@ const RemainingStock = () => {
                       color: i >= 4 && i <= 7 ? '#1976d2' : '#475569',
                       bgcolor: i >= 4 && i <= 7 ? '#f1f7ff' : '#f8fafc',
                       fontWeight: 700, fontSize: '0.8rem', whiteSpace: 'nowrap',
-                      minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 3 ? 150 : 120,
+                      minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 3 ? 150 : i === 8 ? 80 : 120,
                       maxWidth: i === 0 ? 50 : i === 1 ? 160 : 'none',
                       position: 'sticky !important',
                       top: 0,
@@ -212,13 +210,17 @@ const RemainingStock = () => {
                     {group.rows.map((row, rowIdx) => {
                       const status = getStatus(row.accumulated_total, row.total_quantity, row.remaining_quantity);
                       return (
-                        <TableRow key={row.id} hover sx={{ bgcolor: '#ffffff' }}>
-                          <TableCell align="center" sx={{
+                        <TableRow key={row.id} hover sx={{ 
+                          bgcolor: '#ffffff',
+                          '&:hover td': { bgcolor: '#f8fafc' },
+                          '&:hover td.sticky-cell': { bgcolor: '#f8fafc !important' }
+                        }}>
+                          <TableCell align="center" className="sticky-cell" sx={{
                             fontWeight: 500, color: '#94a3b8', fontSize: '0.82rem',
                             position: 'sticky !important', left: '0 !important', bgcolor: '#ffffff', zIndex: 1,
                             borderRight: '1px solid #f1f5f9'
                           }}>{rowIdx + 1}</TableCell>
-                          <TableCell align="center" sx={{
+                          <TableCell align="center" className="sticky-cell" sx={{
                             fontWeight: 800, color: '#1e293b',
                             position: 'sticky !important', left: '50px !important', bgcolor: '#ffffff', zIndex: 1,
                             borderRight: '2px solid #e2e8f0',
@@ -226,39 +228,38 @@ const RemainingStock = () => {
                           }}>{row.ry_number}</TableCell>
                           <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.article || '—'}</TableCell>
                           <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.model_name || '—'}</TableCell>
-                          <TableCell sx={{ color: '#1976d2', fontWeight: 600, fontSize: '0.85rem' }}>{row.total_quantity ?? '—'}</TableCell>
-                          <TableCell sx={{ color: '#6366f1', fontWeight: 600, fontSize: '0.85rem' }}>{row.accumulated_total ?? '—'}</TableCell>
-                          <TableCell sx={{ color: '#1976d2', fontWeight: 600, fontSize: '0.85rem' }}>{row.shipped_quantity ?? '0'}</TableCell>
-                          <TableCell sx={{ color: '#ea580c', fontWeight: 800, fontSize: '0.85rem', bgcolor: '#fffaf5' }}>{row.remaining_quantity ?? '—'}</TableCell>
-                          <TableCell sx={{ minWidth: 100 }}>
-                            <Chip
-                              label={status.label}
-                              size="small"
-                              sx={{
-                                bgcolor: status.bg,
-                                color: status.color,
-                                fontWeight: 700,
-                                fontSize: '0.7rem',
-                                borderRadius: '6px',
-                                border: `1px solid ${status.color}20`
-                              }}
-                            />
+                          <TableCell sx={{ color: '#1976d2', fontWeight: 600, fontSize: '0.85rem', bgcolor: '#f8fbff !important' }}>{row.total_quantity ?? '—'}</TableCell>
+                          <TableCell sx={{ color: '#6366f1', fontWeight: 600, fontSize: '0.85rem', bgcolor: '#faf8ff !important' }}>{row.accumulated_total ?? '—'}</TableCell>
+                          <TableCell sx={{ color: '#1976d2', fontWeight: 600, fontSize: '0.85rem', bgcolor: '#f8fcff !important' }}>{row.shipped_quantity ?? '0'}</TableCell>
+                          <TableCell sx={{ color: '#ea580c', fontWeight: 800, fontSize: '0.85rem', bgcolor: '#fffaf5 !important' }}>{row.remaining_quantity ?? '—'}</TableCell>
+                          <TableCell sx={{ 
+                            bgcolor: `${status.bg} !important`, 
+                            color: `${status.color} !important`,
+                            fontWeight: 800, 
+                            fontSize: '0.8rem'
+                          }}>
+                            {status.label}
                           </TableCell>
 
                           {sizes.map(size => {
-                            const val = row[sizeToCol(size)];
-                            const isEmpty = val === 0 || val === '0' || !val;
+                            const sizeKey = sizeToCol(size);
+                            const val = row[sizeKey];
+                            const originalOrderVal = row[`o${sizeKey}`]; // os3, os3_5, etc from backend
+
+                            const hasOrder = parseFloat(originalOrderVal) > 0;
+                            const isDone = hasOrder && (parseFloat(val) <= 0);
+
                             return (
                               <TableCell
                                 key={size}
                                 sx={{
-                                  color: isEmpty ? '#cbd5e1' : '#ef4444', // Màu đỏ cho số lượng nợ
+                                  color: isDone ? '#16a34a !important' : (!hasOrder ? '#cbd5e1' : '#ef4444 !important'),
                                   fontSize: '0.85rem',
-                                  fontWeight: isEmpty ? 400 : 700,
-                                  bgcolor: isEmpty ? 'transparent' : '#fff5f5'
+                                  fontWeight: (!hasOrder) ? 400 : 800,
+                                  bgcolor: isDone ? '#dcfce7 !important' : (!hasOrder ? 'transparent' : '#fff5f5 !important')
                                 }}
                               >
-                                {isEmpty ? '—' : val}
+                                {!hasOrder ? '—' : (isDone ? 'OK' : val)}
                               </TableCell>
                             );
                           })}

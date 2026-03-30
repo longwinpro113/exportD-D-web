@@ -94,6 +94,7 @@ const ClientOrders = () => {
                         <TextField
                             fullWidth size="small"
                             placeholder="Nhập mã đơn hàng ..."
+                            autoComplete="off"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             InputProps={{
@@ -117,6 +118,10 @@ const ClientOrders = () => {
                                     '& fieldset': { borderColor: '#e2e8f0' },
                                     '&:hover fieldset': { borderColor: '#cbd5e1' },
                                     '&.Mui-focused fieldset': { borderColor: '#1976d2', borderWidth: '2px' },
+                                    '& input:-webkit-autofill': {
+                                        WebkitBoxShadow: '0 0 0 1000px #ffffff inset !important',
+                                        WebkitTextFillColor: '#334155 !important',
+                                    }
                                 }
                             }}
                         />
