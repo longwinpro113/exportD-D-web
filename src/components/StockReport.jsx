@@ -14,8 +14,8 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import ClearIcon from '@mui/icons-material/Clear';
 
 
-// const API_URL = "http://localhost:5000"
-const API_URL = "https://exportd-d-api.onrender.com";
+const API_URL = "http://localhost:5000"
+// const API_URL = "https://exportd-d-api.onrender.com";
 
 const buildSizes = () => {
   const s = [];

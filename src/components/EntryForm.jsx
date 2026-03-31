@@ -55,7 +55,7 @@ const EntryForm = () => {
         fetchOrders();
     }, []);
 
-    const handleOrderChange = (newValue) => {
+    const handleOrderChange = (event, newValue) => {
         if (newValue && typeof newValue === 'object') {
             setFormData(prev => ({
                 ...prev,
@@ -257,7 +257,7 @@ const EntryForm = () => {
                                 fontWeight: 600,
                                 '&.Mui-disabled': {
                                     color: '#0f172a',
-                                    '-webkit-text-fill-color': '#0f172a',
+                                    WebkitTextFillColor: '#0f172a',
                                     '& fieldset': { borderColor: '#e2e8f0 !important' }
                                 }
                             }
@@ -295,10 +295,10 @@ const EntryForm = () => {
 
                 {/* Size Input Grid */}
                 <Box sx={{ mt: 2 }}>
-                    <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: 3, 
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 3,
                         mb: 2,
                         minHeight: 40 // Cố định chiều cao để không bị nhảy layout khi chip xuất hiện/biến mất
                     }}>
@@ -306,13 +306,13 @@ const EntryForm = () => {
                             Nhập số lượng size
                         </Typography>
                         {shippedPreview > 0 && (
-                            <Box sx={{ 
-                                fontWeight: 700, 
-                                fontSize: '0.9rem', 
-                                color: '#1976d2', 
-                                bgcolor: '#e3f2fd', 
-                                px: 1.5, 
-                                py: 0.5, 
+                            <Box sx={{
+                                fontWeight: 700,
+                                fontSize: '0.9rem',
+                                color: '#1976d2',
+                                bgcolor: '#e3f2fd',
+                                px: 1.5,
+                                py: 0.5,
                                 borderRadius: '6px',
                                 display: 'flex',
                                 alignItems: 'center'
@@ -321,7 +321,7 @@ const EntryForm = () => {
                             </Box>
                         )}
                     </Box>
-                    
+
                     <Box sx={{
                         mt: 4, // Đẩy nhẹ các ô input xuống dưới
                         display: 'grid',
