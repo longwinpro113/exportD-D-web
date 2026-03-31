@@ -27,6 +27,7 @@ const EntryForm = () => {
     const [formData, setFormData] = useState({
         ngayGiao: null,
         donHang: '',
+        // delivery_round: '',
         article: '',
         modelName: '',
         totalQuantity: '',
@@ -54,11 +55,12 @@ const EntryForm = () => {
         fetchOrders();
     }, []);
 
-    const handleOrderChange = (event, newValue) => {
+    const handleOrderChange = (newValue) => {
         if (newValue && typeof newValue === 'object') {
             setFormData(prev => ({
                 ...prev,
                 donHang: newValue.ry_number || '',
+                // delivery_round: newValue.delivery_round || '',
                 article: newValue.article || '',
                 modelName: newValue.model_name || '',
                 totalQuantity: newValue.total_order_qty || ''
@@ -280,6 +282,15 @@ const EntryForm = () => {
                             }
                         }}
                     />
+
+                    {/* <TextField
+                        fullWidth
+                        label="Đợt"
+                        // value={formData.delivery_round}
+                        onChange={(e) => setFormData(prev => ({ ...prev, delivery_round: e.target.value }))}
+                        placeholder="Nhập đợt giao..."
+                        sx={inputSx}
+                    /> */}
                 </Box>
 
                 {/* Size Input Grid */}

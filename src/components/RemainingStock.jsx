@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import dayjs from 'dayjs';
 import {
   Box, Typography, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, TextField, InputAdornment,
@@ -8,8 +9,8 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 
-// const API_URL = "http://localhost:5000"
-const API_URL = "https://exportd-d-api.onrender.com";
+const API_URL = "http://localhost:5000"
+// const API_URL = "https://exportd-d-api.onrender.com";
 
 const buildSizes = () => {
   const s = [];
@@ -19,16 +20,9 @@ const buildSizes = () => {
 const sizes = buildSizes();
 const sizeToCol = (size) => `s${size.toString().replace('.', '_')}`;
 
-const groupByDate = (rows) => {
-  const map = new Map();
-  rows.forEach(row => {
-    const d = row.export_date;
-    if (!map.has(d)) map.set(d, []);
-    map.get(d).push(row);
-  });
-  const result = [];
-  map.forEach((rows, date) => result.push({ date, rows }));
-  return result;
+const groupByDate = (rows, searchedDate) => {
+  const displayDate = searchedDate || dayjs().format('DD/MM/YYYY');
+  return [{ date: displayDate, rows }];
 };
 
 const getStatus = (accumulated, total, remaining) => {
@@ -52,8 +46,11 @@ const RemainingStock = () => {
     if (trimmed) {
       if (isDateSearch(trimmed)) {
         url += `?date=${encodeURIComponent(trimmed)}`;
+      } else if (trimmed.startsWith('d:') || trimmed.startsWith('D:')) {
+        url += `?round=${encodeURIComponent(trimmed.slice(2).trim())}`;
       } else {
-        url += `?ry_number=${encodeURIComponent(trimmed)}`;
+        // Find by RY OR Round (backend should handle or we try both)
+        url += `?ry_number=${encodeURIComponent(trimmed)}&any=${encodeURIComponent(trimmed)}`;
       }
     }
 
@@ -61,7 +58,7 @@ const RemainingStock = () => {
       const res = await fetch(url);
       if (!res.ok) throw new Error('Kết nối thất bại!');
       const data = await res.json();
-      setTableData(Array.isArray(data) ? groupByDate(data) : []);
+      setTableData(Array.isArray(data) ? groupByDate(data, isDateSearch(trimmed) ? trimmed : null) : []);
     } catch (err) {
       console.error('Fetch error:', err.message);
       setTableData([]);
@@ -108,7 +105,7 @@ const RemainingStock = () => {
 
           <Box sx={{ width: '360px', mt: 1 }}>
             <TextField
-              placeholder="Tìm ngày (dd/mm) hoặc mã đơn hàng..."
+              placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
               variant="outlined"
               size="small"
               fullWidth
@@ -160,12 +157,12 @@ const RemainingStock = () => {
             }}>
               <TableHead>
                 <TableRow>
-                  {['STT', 'Đơn Hàng', 'Article', 'Model Name', 'Tổng Cần Giao', 'Tổng Tích Lũy', 'Tổng SL Trong Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+                  {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'Tổng Cần Giao', 'Tổng Tích Lũy', 'Tổng SL Trong Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
                     <TableCell key={h} align="center" sx={{
-                      color: i >= 4 && i <= 7 ? '#1976d2' : '#475569',
-                      bgcolor: i >= 4 && i <= 7 ? '#f1f7ff' : '#f8fafc',
+                      color: i >= 5 && i <= 8 ? '#1976d2' : '#475569',
+                      bgcolor: i >= 5 && i <= 8 ? '#f1f7ff' : '#f8fafc',
                       fontWeight: 700, fontSize: '0.8rem', whiteSpace: 'nowrap',
-                      minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 3 ? 150 : i === 8 ? 80 : 120,
+                      minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 2 ? 80 : i === 4 ? 150 : i === 9 ? 80 : 120,
                       maxWidth: i === 0 ? 50 : i === 1 ? 160 : 'none',
                       position: 'sticky !important',
                       top: 0,
@@ -226,6 +223,7 @@ const RemainingStock = () => {
                             borderRight: '2px solid #e2e8f0',
                             boxShadow: '2px 0 5px -1px rgba(0,0,0,0.1)'
                           }}>{row.ry_number}</TableCell>
+                          <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.delivery_round || '—'}</TableCell>
                           <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.article || '—'}</TableCell>
                           <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.model_name || '—'}</TableCell>
                           <TableCell sx={{ color: '#1976d2', fontWeight: 600, fontSize: '0.85rem', bgcolor: '#f8fbff !important' }}>{row.total_quantity ?? '—'}</TableCell>

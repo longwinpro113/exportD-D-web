@@ -14,8 +14,8 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import ClearIcon from '@mui/icons-material/Clear';
 
 
-// const API_URL = "http://localhost:5000"
-const API_URL = "https://exportd-d-api.onrender.com";
+const API_URL = "http://localhost:5000"
+// const API_URL = "https://exportd-d-api.onrender.com";
 
 const buildSizes = () => {
   const s = [];
@@ -37,7 +37,7 @@ const groupByDate = (rows) => {
   return result;
 };
 
-const getStatus = (accumulated, total, remaining) => {
+const getStatus = (remaining) => {
   const rem = parseFloat(remaining) ?? null;
   if (rem !== null && rem <= 0) return { label: 'Ok', color: '#16a34a', bg: '#dcfce7' };
   return { label: 'Not Ok', color: '#dc2626', bg: '#fee2e2' };
@@ -347,16 +347,17 @@ const StockReport = () => {
             }}>
               <TableHead>
                 <TableRow>
-                    {['STT', 'Đơn Hàng', 'Article', 'Model Name', 'Tổng Cần Giao', 'Tổng Tích Lũy', 'Tổng SL Trong Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+                    {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'Tổng Cần Giao', 'Tổng Tích Lũy', 'Tổng SL Trong Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
                         <TableCell key={h} align="center" sx={{
-                            color: i >= 4 && i <= 7 ? '#1976d2' : '#475569',
-                            bgcolor: i >= 4 && i <= 7 ? '#f1f7ff' : '#f8fafc',
-                            fontWeight: 700, fontSize: '0.8rem', whiteSpace: 'nowrap',
-                            minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 3 ? 150 : i === 8 ? 80 : 120,
+                            color: i >= 5 && i <= 8 ? '#1976d2' : '#1e293b',
+                            bgcolor: i >= 5 && i <= 8 ? '#f1f7ff' : '#f8fafc',
+                            fontWeight: 800, fontSize: '0.82rem', whiteSpace: 'nowrap',
+                            minWidth: i === 0 ? 50 : i === 1 ? 160 : i === 2 ? 80 : i === 4 ? 150 : i === 9 ? 80 : 120,
                             maxWidth: i === 0 ? 50 : i === 1 ? 160 : 'none',
                             position: 'sticky !important',
                             top: 0,
                             left: i === 0 ? 0 : i === 1 ? 50 : 'auto',
+                            zIndex: i === 0 ? 15 : 14,
                             zIndex: i <= 1 ? 12 : 2,
                             borderRight: i <= 1 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
                             boxShadow: i === 1 ? '2px 0 5px -1px rgba(0,0,0,0.1)' : 'none'
@@ -381,7 +382,7 @@ const StockReport = () => {
                 {tableData.map((group, groupIdx) => (
                   <React.Fragment key={groupIdx}>
                     <TableRow>
-                      <TableCell colSpan={9 + sizes.length + 1} sx={{ bgcolor: '#f0f7ff', py: 0.8, borderBottom: '2px solid #dbeafe', textAlign: 'left !important', p: 0 }}>
+                      <TableCell colSpan={10 + sizes.length + 1} sx={{ bgcolor: '#f0f7ff', py: 0.8, borderBottom: '2px solid #dbeafe', textAlign: 'left !important', p: 0 }}>
                         <Box sx={{ 
                             display: 'inline-flex', 
                             alignItems: 'center', 
@@ -417,8 +418,9 @@ const StockReport = () => {
                                                 borderRight: '2px solid #e2e8f0',
                                                 boxShadow: '2px 0 5px -1px rgba(0,0,0,0.1)'
                                             }}>{row.ry_number}</TableCell>
-                          <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.article || '—'}</TableCell>
-                          <TableCell sx={{ color: '#475569', fontSize: '0.82rem' }}>{row.model_name || '—'}</TableCell>
+                          <TableCell sx={{ color: '#1e293b', fontSize: '0.82rem', fontWeight: 800 }}>{row.delivery_round || '—'}</TableCell>
+                          <TableCell sx={{ color: '#1e293b', fontSize: '0.82rem', fontWeight: 800 }}>{row.article || '—'}</TableCell>
+                          <TableCell sx={{ color: '#1e293b', fontSize: '0.82rem', fontWeight: 800 }}>{row.model_name || '—'}</TableCell>
                           <TableCell sx={{ color: '#1976d2', fontWeight: 700, fontSize: '0.85rem', bgcolor: '#f8fbff !important' }}>{row.total_quantity ?? '—'}</TableCell>
                           <TableCell sx={{ color: '#7c3aed', fontWeight: 700, fontSize: '0.85rem', bgcolor: '#faf8ff !important' }}>{row.accumulated_total ?? 0}</TableCell>
                           <TableCell sx={{ color: '#0369a1', fontWeight: 600, fontSize: '0.85rem', bgcolor: '#f8fcff !important' }}>{row.shipped_quantity ?? 0}</TableCell>
