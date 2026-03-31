@@ -9,8 +9,8 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 
-const API_URL = "http://localhost:5000"
-// const API_URL = "https://exportd-d-api.onrender.com";
+// const API_URL = "http://localhost:5000"
+const API_URL = "https://exportd-d-api.onrender.com";
 
 const buildSizes = () => {
   const s = [];
