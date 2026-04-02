@@ -129,7 +129,7 @@ const RemainingStock = () => {
                                 fontWeight: hasOrder ? 800 : 400,
                                 bgcolor: isDone ? '#dcfce7' : 'transparent'
                               }}>
-                                {!hasOrder ? '—' : (isDone ? 'Ok' : val)}
+                                {!hasOrder ? '—' : (isDone ? 'OK' : val)}
                               </TableCell>
                             );
                           })}
