@@ -188,7 +188,7 @@ const StockReport = () => {
         }}>
           <TableHead>
             <TableRow>
-              {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Giao', 'SL Tích Lũy', 'SL Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+              {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
                 <TableCell key={h} sx={{
                   bgcolor: i >= 5 && i <= 8 ? '#f1f7ff' : '#f8fafc',
                   fontWeight: 800, fontSize: '0.82rem',
