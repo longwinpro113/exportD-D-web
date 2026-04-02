@@ -11,8 +11,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+// require
 
-const API_URL = "https://exportd-d-api.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = "http://localhost:5000";
 
 const buildSizes = () => {
     const s = [];
@@ -27,7 +29,6 @@ const EntryForm = () => {
     const [formData, setFormData] = useState({
         ngayGiao: null,
         donHang: '',
-        // delivery_round: '',
         article: '',
         modelName: '',
         totalQuantity: '',
@@ -60,7 +61,6 @@ const EntryForm = () => {
             setFormData(prev => ({
                 ...prev,
                 donHang: newValue.ry_number || '',
-                // delivery_round: newValue.delivery_round || '',
                 article: newValue.article || '',
                 modelName: newValue.model_name || '',
                 totalQuantity: newValue.total_order_qty || ''
@@ -76,40 +76,29 @@ const EntryForm = () => {
 
     const handleSave = async () => {
         if (!formData.ngayGiao || !formData.donHang) {
-            setSnackbar({ open: true, message: 'Please select a date and order.', severity: 'warning' });
+            setSnackbar({ open: true, message: 'Vui lòng chọn ngày và đơn hàng.', severity: 'warning' });
             return;
         }
 
         setSaving(true);
         try {
-            const shipped_quantity = Object.values(formData.sizeValues)
-                .reduce((sum, v) => sum + (parseFloat(v) || 0), 0);
-
-            const prevRes = await fetch(`${API_URL}/api/export?ry_number=${encodeURIComponent(formData.donHang)}`);
-            const prevData = await prevRes.json();
-
-            const prevTotal = Array.isArray(prevData)
-                ? prevData.reduce((sum, row) => sum + (parseFloat(row.shipped_quantity) || 0), 0)
-                : 0;
-            const accumulated_total = prevTotal + shipped_quantity;
-            const remaining_quantity = (parseFloat(formData.totalQuantity) || 0) - accumulated_total;
-
+            // 1. Chỉ gom dữ liệu size vào payload
             const sizePayload = {};
             sizes.forEach(size => {
                 sizePayload[sizeToCol(size)] = parseFloat(formData.sizeValues[size]) || 0;
             });
 
-            const parts = formData.ngayGiao.split('/');
-            const export_date = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            // 2. Format ngày cho đúng chuẩn YYYY-MM-DD
+            const export_date = dayjs(formData.ngayGiao, 'DD/MM/YYYY').format('YYYY-MM-DD');
 
+            // 3. Tạo Payload tối giản (DB sẽ tự lo accumulated và remaining)
             const payload = {
                 export_date,
                 ry_number: formData.donHang,
-                shipped_quantity,
-                accumulated_total,
-                remaining_quantity,
                 ...sizePayload
             };
+
+            console.log("Payload: ", payload)
 
             const res = await fetch(`${API_URL}/api/export`, {
                 method: 'POST',
@@ -119,7 +108,7 @@ const EntryForm = () => {
 
             if (!res.ok) {
                 const err = await res.json();
-                throw new Error(err.error || 'Save failed');
+                throw new Error(err.error || 'Lưu thất bại');
             }
 
             setSnackbar({ open: true, message: 'Lưu thành công.', severity: 'success' });
@@ -132,9 +121,11 @@ const EntryForm = () => {
         }
     };
 
+    // Tính toán tạm thời để hiển thị Chip trên UI
     const shippedPreview = Object.values(formData.sizeValues)
         .reduce((sum, v) => sum + (parseFloat(v) || 0), 0);
 
+    // Style cho các ô Input
     const inputSx = {
         '& .MuiOutlinedInput-root': {
             borderRadius: '8px',
@@ -161,6 +152,7 @@ const EntryForm = () => {
                 width: '100%',
                 minHeight: 'fit-content'
             }}>
+                {/* Header Row: Date & Order Info */}
                 <Box sx={{
                     display: 'grid',
                     gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(4, 1fr)' },
@@ -168,179 +160,90 @@ const EntryForm = () => {
                     width: '100%',
                     mb: 1
                 }}>
-                    <Box component="div" sx={{ width: '100%' }}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                                label="Ngày giao hàng"
-                                format="DD/MM/YYYY"
-                                value={formData.ngayGiao ? dayjs(formData.ngayGiao, 'DD/MM/YYYY') : null}
-                                onChange={(newValue) => {
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        ngayGiao: newValue ? newValue.format('DD/MM/YYYY') : ''
-                                    }));
-                                }}
-                                slotProps={{
-                                    textField: {
-                                        fullWidth: true,
-                                        placeholder: formData.ngayGiao ? '' : 'Chọn ngày...',
-                                        InputProps: {
-                                            endAdornment: formData.ngayGiao && (
-                                                <InputAdornment position="end" sx={{ mr: 1 }}>
-                                                    <IconButton size="small" onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setFormData(prev => ({ ...prev, ngayGiao: '' }));
-                                                    }}>
-                                                        <ClearIcon sx={{ fontSize: '1.1rem' }} />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            )
-                                        },
-                                        sx: inputSx
-                                    }
-                                }}
-                            />
-                        </LocalizationProvider>
-                    </Box>
-
-                    <Box component="div" sx={{ width: '100%' }}>
-                        <Autocomplete
-                            disablePortal
-                            options={orderOptions}
-                            getOptionLabel={(option) => typeof option === 'string' ? option : option.ry_number || ''}
-                            loading={loadingOrders}
-                            value={formData.donHang
-                                ? (orderOptions.find(o => o.ry_number === formData.donHang) || formData.donHang)
-                                : null}
-                            onChange={handleOrderChange}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Đơn Hàng"
-                                    placeholder="Chọn đơn hàng..."
-                                    required
-                                    InputProps={{
-                                        ...params.InputProps,
-                                        endAdornment: (
-                                            <React.Fragment>
-                                                {loadingOrders ? <CircularProgress color="inherit" size={20} /> : null}
-                                                {params.InputProps.endAdornment}
-                                            </React.Fragment>
-                                        ),
-                                    }}
-                                />
-                            )}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: '8px',
-                                    bgcolor: '#ffffff',
-                                    fontWeight: 600,
-                                    color: '#000000',
-                                    '& fieldset': { borderColor: '#000000', borderWidth: '1px' },
-                                    '&:hover fieldset': { borderColor: '#334155' },
-                                    '&.Mui-focused fieldset': { borderColor: '#000000', borderWidth: '2px' },
-                                },
-                                '& .MuiInputLabel-root.Mui-focused': { color: '#000000' }
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="Ngày giao hàng"
+                            format="DD/MM/YYYY"
+                            value={formData.ngayGiao ? dayjs(formData.ngayGiao, 'DD/MM/YYYY') : null}
+                            onChange={(newValue) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    ngayGiao: newValue ? newValue.format('DD/MM/YYYY') : ''
+                                }));
+                            }}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true,
+                                    sx: inputSx
+                                }
                             }}
                         />
-                    </Box>
+                    </LocalizationProvider>
 
-                    <TextField
-                        fullWidth
-                        label="Article"
-                        disabled
-                        value={formData.article}
+                    <Autocomplete
+                        disablePortal
+                        options={orderOptions}
+                        getOptionLabel={(option) => typeof option === 'string' ? option : option.ry_number || ''}
+                        loading={loadingOrders}
+                        value={formData.donHang ? (orderOptions.find(o => o.ry_number === formData.donHang) || formData.donHang) : null}
+                        onChange={handleOrderChange}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Đơn Hàng"
+                                required
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <>
+                                            {loadingOrders ? <CircularProgress color="inherit" size={20} /> : null}
+                                            {params.InputProps.endAdornment}
+                                        </>
+                                    ),
+                                }}
+                            />
+                        )}
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: '8px',
-                                bgcolor: formData.article ? '#f8fafc' : '#cbd5e1',
+                                bgcolor: '#ffffff',
                                 fontWeight: 600,
-                                '&.Mui-disabled': {
-                                    color: '#0f172a',
-                                    WebkitTextFillColor: '#0f172a',
-                                    '& fieldset': { borderColor: '#e2e8f0 !important' }
-                                }
+                                '& fieldset': { borderColor: '#000000' },
+                                '&.Mui-focused fieldset': { borderColor: '#000000', borderWidth: '2px' },
                             }
                         }}
                     />
 
-                    <TextField
-                        fullWidth
-                        label="Model Name"
-                        disabled
-                        value={formData.modelName}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: '8px',
-                                bgcolor: formData.modelName ? '#f8fafc' : '#cbd5e1',
-                                fontWeight: 600,
-                                '&.Mui-disabled': {
-                                    color: '#0f172a',
-                                    '-webkit-text-fill-color': '#0f172a',
-                                    '& fieldset': { borderColor: '#e2e8f0 !important' }
-                                }
-                            }
-                        }}
+                    <TextField fullWidth label="Article" disabled value={formData.article}
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', bgcolor: '#f8fafc', fontWeight: 600, '-webkit-text-fill-color': '#0f172a' } }}
                     />
 
-                    {/* <TextField
-                        fullWidth
-                        label="Đợt"
-                        // value={formData.delivery_round}
-                        onChange={(e) => setFormData(prev => ({ ...prev, delivery_round: e.target.value }))}
-                        placeholder="Nhập đợt giao..."
-                        sx={inputSx}
-                    /> */}
+                    <TextField fullWidth label="Model Name" disabled value={formData.modelName}
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', bgcolor: '#f8fafc', fontWeight: 600, '-webkit-text-fill-color': '#0f172a' } }}
+                    />
                 </Box>
 
                 {/* Size Input Grid */}
                 <Box sx={{ mt: 2 }}>
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 3,
-                        mb: 2,
-                        minHeight: 40 // Cố định chiều cao để không bị nhảy layout khi chip xuất hiện/biến mất
-                    }}>
-                        <Typography sx={{ fontWeight: 500, fontSize: '1rem', color: '#1e293b' }}>
-                            Nhập số lượng size
-                        </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 2, minHeight: 40 }}>
+                        <Typography sx={{ fontWeight: 500, color: '#1e293b' }}>Nhập số lượng size</Typography>
                         {shippedPreview > 0 && (
-                            <Box sx={{
-                                fontWeight: 700,
-                                fontSize: '0.9rem',
-                                color: '#1976d2',
-                                bgcolor: '#e3f2fd',
-                                px: 1.5,
-                                py: 0.5,
-                                borderRadius: '6px',
-                                display: 'flex',
-                                alignItems: 'center'
-                            }}>
+                            <Box sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#1976d2', bgcolor: '#e3f2fd', px: 1.5, py: 0.5, borderRadius: '6px' }}>
                                 SL giao hôm nay: {shippedPreview}
                             </Box>
                         )}
                     </Box>
 
                     <Box sx={{
-                        mt: 4, // Đẩy nhẹ các ô input xuống dưới
                         display: 'grid',
-                        gridTemplateColumns: {
-                            xs: 'repeat(auto-fill, minmax(70px, 1fr))',
-                            sm: 'repeat(auto-fill, minmax(80px, 1fr))'
-                        },
+                        gridTemplateColumns: { xs: 'repeat(auto-fill, minmax(70px, 1fr))', sm: 'repeat(auto-fill, minmax(80px, 1fr))' },
                         gap: '16px 60px',
                     }}>
                         {sizes.map((size) => (
                             <Box key={size} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                                <Typography sx={{ color: '#475569', fontWeight: 500, fontSize: '0.9rem' }}>
-                                    {size}
-                                </Typography>
+                                <Typography sx={{ color: '#475569', fontWeight: 500, fontSize: '0.9rem' }}>{size}</Typography>
                                 <TextField
-                                    fullWidth
-                                    size="small"
-                                    autoComplete="off"
-                                    placeholder=""
+                                    fullWidth size="small" autoComplete="off"
                                     value={formData.sizeValues[size] || ''}
                                     onChange={(e) => {
                                         const val = e.target.value;
@@ -351,16 +254,10 @@ const EntryForm = () => {
                                             }));
                                         }
                                     }}
-                                    inputProps={{
-                                        style: { textAlign: 'center', padding: '10px 0', fontSize: '0.9rem', fontWeight: 500, color: '#475569' }
-                                    }}
+                                    inputProps={{ style: { textAlign: 'center', fontWeight: 500 } }}
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             borderRadius: '8px',
-                                            fontWeight: 500,
-                                            '& fieldset': { borderColor: '#e2e8f0' },
-                                            '&:hover fieldset': { borderColor: '#cbd5e1' },
-                                            '&.Mui-focused fieldset': { borderColor: '#1976d2' },
                                             bgcolor: (formData.sizeValues[size] && formData.sizeValues[size] !== '0') ? '#ffffff' : '#cbd5e1'
                                         }
                                     }}
@@ -370,37 +267,22 @@ const EntryForm = () => {
                     </Box>
                 </Box>
 
-                <Box sx={{ mt: 'auto', pt: 4, display: 'flex', alignItems: 'center', gap: 2, borderTop: '1px solid #f1f5f9' }}>
+                {/* Footer Actions */}
+                <Box sx={{ mt: 'auto', pt: 4, display: 'flex', gap: 2, borderTop: '1px solid #f1f5f9' }}>
                     <Button
                         variant="contained"
                         startIcon={saving ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
                         disabled={saving}
                         onClick={handleSave}
-                        sx={{
-                            backgroundColor: '#1976d2',
-                            textTransform: 'none',
-                            borderRadius: '8px',
-                            px: 4, py: 1.2,
-                            fontWeight: 500,
-                            boxShadow: 'none',
-                            '&:hover': { backgroundColor: '#1565c0', boxShadow: 'none' }
-                        }}
+                        sx={{ textTransform: 'none', borderRadius: '8px', px: 4, py: 1.2, fontWeight: 500 }}
                     >
-                        {saving ? 'Saving...' : 'Save'}
+                        {saving ? 'Đang lưu...' : 'Lưu báo cáo'}
                     </Button>
                     <Button
                         variant="outlined"
                         onClick={handleReset}
                         startIcon={<RestartAltIcon />}
-                        sx={{
-                            color: '#334155',
-                            borderColor: '#e2e8f0',
-                            textTransform: 'none',
-                            borderRadius: '8px',
-                            px: 3, py: 1.2,
-                            fontWeight: 500,
-                            '&:hover': { borderColor: '#cbd5e1', backgroundColor: '#f8fafc' }
-                        }}
+                        sx={{ textTransform: 'none', borderRadius: '8px', px: 3, py: 1.2, fontWeight: 500, color: '#334155' }}
                     >
                         Làm mới
                     </Button>
@@ -413,13 +295,7 @@ const EntryForm = () => {
                 onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
-                <Alert
-                    severity={snackbar.severity}
-                    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-                    sx={{ borderRadius: '8px', fontWeight: 500 }}
-                >
-                    {snackbar.message}
-                </Alert>
+                <Alert severity={snackbar.severity} sx={{ borderRadius: '8px' }}>{snackbar.message}</Alert>
             </Snackbar>
         </Box>
     );

@@ -7,7 +7,8 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 
-const API_URL = "https://exportd-d-api.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = "http://localhost:5000";
 
 const ClientOrders = () => {
     const sizes = [];
