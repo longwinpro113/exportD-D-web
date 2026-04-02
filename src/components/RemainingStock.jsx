@@ -117,7 +117,7 @@ const RemainingStock = () => {
                           <TableCell sx={{ color: '#6366f1', fontWeight: 600 }}>{row.accumulated_total}</TableCell>
                           <TableCell sx={{ color: '#ea580c', fontWeight: 800 }}>{row.remaining_quantity}</TableCell>
                           <TableCell sx={{ bgcolor: isOk ? '#dcfce7 !important' : '#fee2e2 !important', color: isOk ? '#16a34a !important' : '#dc2626 !important', fontWeight: 800 }}>
-                            {isOk ? 'Ok' : 'Not Ok'}
+                            {isOk ? 'OK' : 'Not OK'}
                           </TableCell>
                           {sizes.map(size => {
                             const val = row[sizeToCol(size)];
