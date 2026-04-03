@@ -175,7 +175,7 @@ const StockReport = () => {
         }}>
           <TableHead>
             <TableRow>
-              {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+              {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
                 <TableCell key={h} sx={{
                   bgcolor: i >= 5 && i <= 8 ? '#f1f7ff' : '#f8fafc',
                   fontWeight: 800, fontSize: '0.82rem',
@@ -222,7 +222,7 @@ const StockReport = () => {
                       <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name}</TableCell>
                       <TableCell sx={{ ...cellStyle, color: '#1976d2', fontWeight: 700 }}>{row.total_quantity}</TableCell>
                       <TableCell sx={{ ...cellStyle, color: '#7c3aed', fontWeight: 700 }}>{row.accumulated_total}</TableCell>
-                      <TableCell sx={{ ...cellStyle, color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity}</TableCell>
+                      {/* <TableCell sx={{ ...cellStyle, color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity}</TableCell> */}
                       <TableCell sx={{ ...cellStyle, fontWeight: 600, color: row.remaining_quantity <= 0 ? '#16a34a' : '#ef4444' }}>{row.remaining_quantity}</TableCell>
                       <TableCell sx={{ ...cellStyle, bgcolor: status.bg, color: status.color, fontWeight: 800, fontSize: '0.75rem' }}>{status.label}</TableCell>
                       {sizes.map(s => {
