@@ -38,6 +38,7 @@ const ClientOrders = () => {
             return {
                 id: item.ry_number,
                 donHang: item.ry_number || '',
+                client: item.client || '',
                 article: item.article || '',
                 modelName: item.model_name || '',
                 total: item.total_order_qty || 0,
@@ -54,13 +55,16 @@ const ClientOrders = () => {
         if (!query.q.trim()) {
             setFilteredData(tableData);
         } else {
+            const q = query.q.toLowerCase();
             setFilteredData(tableData.filter(item =>
-                item.donHang.toLowerCase().includes(query.q.toLowerCase())
+                item.donHang.toLowerCase().includes(q) || 
+                item.client.toLowerCase().includes(q) ||
+                item.modelName.toLowerCase().includes(q)
             ));
         }
     }, [query.q, tableData]);
 
-    const cellStyle = { color: '#1e293b', fontSize: '0.85rem', height: 38, borderRight: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' };
+    const cellStyle = { color: '#1e293b', fontSize: '0.85rem', height: 38, border: '1px solid #e2e8f0' };
 
     return (
         <Box sx={{ p: { xs: 2, md: 3 }, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -74,7 +78,7 @@ const ClientOrders = () => {
                 border: '1px solid #e2e8f0'
             }}>
                 <ReportHeader 
-                    title="THEO DÕI ĐƠN HÀNG (CLIENT ORDERS)"
+                    title="THEO DÕI ĐƠN HÀNG"
                     sender="Danh sách chi tiết các đơn hàng và số liệu từng size"
                     placeholder="Nhập mã đơn hàng ..."
                     onSearch={(text) => updateQuery({ q: text })}
@@ -88,11 +92,11 @@ const ClientOrders = () => {
                         }}>
                             <TableHead>
                                 <TableRow>
-                                    {['STT', 'Đơn Hàng', 'Article', 'Model Name', 'Total', 'Đợt giao hàng'].map((h, i) => (
+                                    {['STT', 'Đơn Hàng', 'Khách hàng', 'Article', 'Model Name', 'Total', 'Đợt giao'].map((h, i) => (
                                         <TableCell key={h} align="center" sx={{
                                             color: '#475569', fontWeight: 600, fontSize: '0.85rem',
-                                            minWidth: i === 0 ? 50 : i === 3 ? 140 : i === 2 ? 80 : 120,
-                                            backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0'
+                                            minWidth: i === 0 ? 50 : i === 1 ? 140 : i === 2 ? 150 : 80,
+                                            backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', sticky: i <= 1 ? 'left' : 'auto'
                                         }}>{h}</TableCell>
                                     ))}
                                     {sizes.map(s => (
@@ -110,6 +114,7 @@ const ClientOrders = () => {
                                             {index + 1}
                                         </TableCell>
                                         <TableCell align="center" sx={{ ...cellStyle, fontWeight: 600 }}>{row.donHang}</TableCell>
+                                        <TableCell align="center" sx={cellStyle}>{row.client}</TableCell>
                                         <TableCell align="center" sx={cellStyle}>{row.article}</TableCell>
                                         <TableCell align="center" sx={{ ...cellStyle, fontWeight: 600 }}>{row.modelName}</TableCell>
                                         <TableCell align="center" sx={{ ...cellStyle, fontWeight: 700 }}>{row.total}</TableCell>

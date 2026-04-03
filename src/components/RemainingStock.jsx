@@ -34,11 +34,12 @@ const RemainingStock = () => {
         display: 'flex', flexDirection: 'column', border: '1px solid #e2e8f0', overflow: 'hidden'
       }}>
 
-        <ReportHeader
-          title="CHI TIẾT HÀNG CÒN NỢ"
-          placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
-          onSearch={(t) => updateQuery({ q: t })}
-          loading={loading}
+        <ReportHeader 
+          title="CHI TIẾT HÀNG CÒN NỢ" 
+          receiver={tableData[0]?.rows[0]?.client || "Công Ty Lạc Tỷ"}
+          placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..." 
+          onSearch={(t) => updateQuery({ q: t })} 
+          loading={loading} 
         />
 
         <Box sx={{ flex: 1, borderTop: '1px solid #e2e8f0', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -46,7 +47,7 @@ const RemainingStock = () => {
             <Table size="small" sx={{
               minWidth: 2800, borderCollapse: 'separate', borderSpacing: 0,
               '& th, & td': {
-                border: '1px solid #f1f5f9',
+                border: '1px solid #e2e8f0',
                 py: 0.6, px: 1,
                 textAlign: 'center',
                 whiteSpace: 'nowrap'
@@ -80,12 +81,13 @@ const RemainingStock = () => {
                 {tableData.map((group, groupIdx) => (
                   <React.Fragment key={groupIdx}>
                     <TableRow>
-                      <TableCell colSpan={12 + sizes.length} sx={{ bgcolor: '#fff7ed', textAlign: 'left !important', py: 0.5 }}>
+                      <TableCell colSpan={10} sx={{ bgcolor: '#fff7ed', textAlign: 'left !important', py: 0.5, borderBottom: '1px solid #e2e8f0' }}>
                         <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, position: 'sticky', left: '60px' }}>
                           <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#c2410c' }} />
                           <Typography sx={{ fontWeight: 700, color: '#c2410c', fontSize: '0.85rem' }}>{group.date}</Typography>
                         </Box>
                       </TableCell>
+                      <TableCell colSpan={sizes.length} sx={{ bgcolor: '#e2e8f0', p: 0, borderBottom: '1px solid #e2e8f0' }} />
                     </TableRow>
 
                     {group.rows.map((row, rowIdx) => {
@@ -115,7 +117,7 @@ const RemainingStock = () => {
                               <TableCell key={size} sx={{
                                 color: isDone ? '#16a34a' : (hasOrder ? '#dc2626' : '#94a3b8'),
                                 fontWeight: hasOrder ? 800 : 400,
-                                bgcolor: isDone ? '#dcfce7 !important' : (hasOrder ? 'transparent' : '#f1f5f9'),
+                                bgcolor: isDone ? '#dcfce7 !important' : (hasOrder ? 'transparent' : '#e2e8f0'),
                                 minWidth: 45, width: 45, maxWidth: 45, p: '0 !important'
                               }}>
                                 {!hasOrder ? '' : (isDone ? 'Ok' : val)}

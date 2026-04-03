@@ -165,8 +165,7 @@ const StockReport = () => {
           borderCollapse: 'separate',
           borderSpacing: 0, 
           '& th, & td': { 
-            borderBottom: '1px solid #f1f5f9', 
-            borderRight: '1px solid #f1f5f9', 
+            border: '1px solid #e2e8f0', 
             py: 0.6, px: 1, 
             textAlign: 'center',
             whiteSpace: 'nowrap'
@@ -202,12 +201,13 @@ const StockReport = () => {
             {tableData.map((group, gIdx) => (
               <React.Fragment key={gIdx}>
                 <TableRow>
-                  <TableCell colSpan={12 + sizes.length} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0.5 }}>
+                  <TableCell colSpan={10} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0.5, borderBottom: '1px solid #e2e8f0' }}>
                     <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, position: 'sticky', left: '60px' }}>
                       <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#1976d2' }} />
                       <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.85rem' }}>{group.date}</Typography>
                     </Box>
                   </TableCell>
+                  <TableCell colSpan={sizes.length + 2} sx={{ bgcolor: '#e2e8f0', p: 0, borderBottom: '1px solid #e2e8f0' }} />
                 </TableRow>
                 {group.rows.map((row, rIdx) => {
                   const status = getStatus(row.remaining_quantity);
@@ -229,8 +229,8 @@ const StockReport = () => {
                           <TableCell key={s} sx={{ 
                             color: val > 0 ? '#334155' : '#94a3b8', 
                             fontWeight: val > 0 ? 800 : 400,
-                            bgcolor: val > 0 ? 'transparent' : '#f1f5f9',
-                            minWidth: 45, width: 45, maxWidth: 45
+                            bgcolor: val > 0 ? 'transparent' : '#e2e8f0',
+                            minWidth: 45, width: 45, maxWidth: 45, p: '0 !important'
                           }}>
                             {val > 0 ? val : ''}
                           </TableCell>
@@ -260,7 +260,8 @@ const StockReport = () => {
       <Paper elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: '12px', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', bgcolor: '#fff' }}>
 
         <ReportHeader
-          title="BIỂU GIAO THÀNH PHẨM QUA CÔNG TY LẠC TỶ"
+          title="BIỂU GIAO THÀNH PHẨM"
+          receiver={tableData[0]?.rows[0]?.client || "Công Ty Lạc Tỷ"}
           placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
           onSearch={(t) => updateQuery({ q: t })}
           loading={loading}
