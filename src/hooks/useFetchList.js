@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 
-// const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const API_URL = "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// const API_URL = "http://localhost:5000";
 
 const useFetchList = (path, query, config = {}) => {
   const [data, setData] = useState([]);
