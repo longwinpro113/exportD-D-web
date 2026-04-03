@@ -57,13 +57,16 @@ const RemainingStock = () => {
                       position: 'sticky', top: 0, 
                       left: i === 0 ? 0 : i === 1 ? 50 : 'auto',
                       zIndex: i <= 1 ? 12 : 2,
-                      minWidth: i === 0 ? 50 : i === 1 ? 160 : 120,
+                      minWidth: i === 0 ? 50 : i === 1 ? 150 : (i >= 5 ? 110 : 100),
                       borderRight: i === 1 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
                       boxShadow: i === 1 ? '2px 0 5px -1px rgba(0,0,0,0.1)' : 'none'
                     }}>{h}</TableCell>
                   ))}
                   {sizes.map(size => (
-                    <TableCell key={size} sx={{ bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, zIndex: 1, minWidth: 45 }}>{size}</TableCell>
+                    <TableCell key={size} sx={{ 
+                      bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, zIndex: 1, 
+                      minWidth: 45, width: 45, maxWidth: 45 
+                    }}>{size}</TableCell>
                   ))}
                 </TableRow>
               </TableHead>
@@ -90,9 +93,9 @@ const RemainingStock = () => {
                         <TableRow key={row.ry_number + rowIdx} hover>
                           <TableCell sx={{ position: 'sticky', left: 0, bgcolor: 'white', zIndex: 1, color: '#94a3b8' }}>{rowIdx + 1}</TableCell>
                           <TableCell sx={{ position: 'sticky', left: 50, bgcolor: 'white', zIndex: 1, fontWeight: 800, borderRight: '2px solid #e2e8f0' }}>{row.ry_number}</TableCell>
-                          <TableCell>{row.delivery_round || '—'}</TableCell>
-                          <TableCell>{row.article || '—'}</TableCell>
-                          <TableCell>{row.model_name || '—'}</TableCell>
+                          <TableCell>{row.delivery_round || ''}</TableCell>
+                          <TableCell>{row.article || ''}</TableCell>
+                          <TableCell>{row.model_name || ''}</TableCell>
                           <TableCell sx={{ color: '#1976d2', fontWeight: 600 }}>{row.total_quantity}</TableCell>
                           <TableCell sx={{ color: '#6366f1', fontWeight: 600 }}>{row.accumulated_total}</TableCell>
                           <TableCell sx={{ color: '#ea580c', fontWeight: 800 }}>{row.remaining_quantity}</TableCell>
@@ -111,7 +114,7 @@ const RemainingStock = () => {
                                 color: isDone ? '#16a34a' : (hasOrder ? '#dc2626' : '#94a3b8'),
                                 fontWeight: hasOrder ? 800 : 400,
                                 bgcolor: isDone ? '#dcfce7 !important' : (hasOrder ? 'transparent' : '#f1f5f9'),
-                                minWidth: 45
+                                minWidth: 45, width: 45, maxWidth: 45
                               }}>
                                 {!hasOrder ? '' : (isDone ? 'Ok' : val)}
                               </TableCell>

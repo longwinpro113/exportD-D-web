@@ -181,7 +181,10 @@ const StockReport = () => {
                 }}>{h}</TableCell>
               ))}
               {sizes.map(size => (
-                <TableCell key={size} sx={{ bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, zIndex: 1 }}>{size}</TableCell>
+                <TableCell key={size} sx={{ 
+                  bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, zIndex: 1,
+                  minWidth: 45, width: 45, maxWidth: 45
+                }}>{size}</TableCell>
               ))}
               {/* CỘT CẬP NHẬT LÚC MỚI */}
               <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, zIndex: 1, minWidth: '120px' }}>Cập nhật lúc</TableCell>
@@ -215,7 +218,16 @@ const StockReport = () => {
                       <TableCell sx={{ bgcolor: status.bg, color: status.color, fontWeight: 800 }}>{status.label}</TableCell>
                       {sizes.map(s => {
                         const val = row[sizeToCol(s)];
-                        return <TableCell key={s} sx={{ color: val > 0 ? '#334155' : '#e2e8f0', fontWeight: val > 0 ? 800 : 400 }}>{val > 0 ? val : ''}</TableCell>;
+                        return (
+                          <TableCell key={s} sx={{ 
+                            color: val > 0 ? '#334155' : '#94a3b8', 
+                            fontWeight: val > 0 ? 800 : 400,
+                            bgcolor: val > 0 ? 'transparent' : '#f1f5f9',
+                            minWidth: 45, width: 45, maxWidth: 45
+                          }}>
+                            {val > 0 ? val : ''}
+                          </TableCell>
+                        );
                       })}
                       {/* DỮ LIỆU CỘT THỜI GIAN CẬP NHẬT */}
                       <TableCell sx={{color: 'black', fontSize: '0.82rem', fontWeight: 800 }}>
