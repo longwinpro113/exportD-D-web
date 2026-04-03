@@ -163,7 +163,13 @@ const StockReport = () => {
           minWidth: 2400, // Tăng nhẹ minWidth để chứa cột thời gian mới
           borderCollapse: 'separate',
           borderSpacing: 0, 
-          '& th, & td': { borderBottom: '1px solid #f1f5f9', borderRight: '1px solid #f1f5f9', py: 1, px: 1, textAlign: 'center' }
+          '& th, & td': { 
+            borderBottom: '1px solid #f1f5f9', 
+            borderRight: '1px solid #f1f5f9', 
+            py: 0.6, px: 1, 
+            textAlign: 'center',
+            whiteSpace: 'nowrap'
+          }
         }}>
           <TableHead>
             <TableRow>
@@ -183,7 +189,7 @@ const StockReport = () => {
               {sizes.map(size => (
                 <TableCell key={size} sx={{ 
                   bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, zIndex: 1,
-                  minWidth: 45, width: 45, maxWidth: 45
+                  minWidth: 45, width: 45, maxWidth: 45, p: '0 !important'
                 }}>{size}</TableCell>
               ))}
               {/* CỘT CẬP NHẬT LÚC MỚI */}
@@ -210,12 +216,12 @@ const StockReport = () => {
                       <TableCell sx={{ position: 'sticky', left: '50px', bgcolor: 'white', zIndex: 5, fontWeight: 800, borderRight: '2px solid #e2e8f0', width: '150px' }}>{row.ry_number}</TableCell>
                       <TableCell sx={{ fontWeight: 800, color: '#DAA06D' }}>{row.delivery_round}</TableCell>
                       <TableCell sx={{ fontWeight: 800, color: '#DAA06D' }}>{row.article}</TableCell>
-                      <TableCell sx={{ fontWeight: 800, color: '#DAA06D' }}>{row.model_name}</TableCell>
+                      <TableCell sx={{ fontWeight: 800, color: '#DAA06D', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name}</TableCell>
                       <TableCell sx={{ color: '#1976d2', fontWeight: 700 }}>{row.total_quantity}</TableCell>
                       <TableCell sx={{ color: '#7c3aed', fontWeight: 700 }}>{row.accumulated_total}</TableCell>
                       <TableCell sx={{ color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity}</TableCell>
                       <TableCell sx={{ fontWeight: 600, color: row.remaining_quantity <= 0 ? '#16a34a' : '#ef4444' }}>{row.remaining_quantity}</TableCell>
-                      <TableCell sx={{ bgcolor: status.bg, color: status.color, fontWeight: 800 }}>{status.label}</TableCell>
+                      <TableCell sx={{ bgcolor: status.bg, color: status.color, fontWeight: 800, fontSize: '0.75rem' }}>{status.label}</TableCell>
                       {sizes.map(s => {
                         const val = row[sizeToCol(s)];
                         return (
