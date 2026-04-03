@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 export const exportStockReportPdf = async (group, sizes) => {
     try {
@@ -69,7 +69,7 @@ export const exportStockReportPdf = async (group, sizes) => {
             ];
         });
 
-        doc.autoTable({
+        autoTable(doc, {
             startY: 125,
             head: head,
             body: body,
