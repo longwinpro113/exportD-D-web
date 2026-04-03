@@ -102,18 +102,18 @@ const RemainingStock = () => {
                           {sizes.map(size => {
                             const sc = sizeToCol(size);
                             const val = row[sc];
-                            const originalQty = parseFloat(row['os' + sc]) || 0;
+                            const originalQty = parseFloat(row['o' + sc]) || 0; // Backend sends os3, os3_5 if sc is s3
                             const hasOrder = originalQty > 0;
                             const isDone = hasOrder && val <= 0;
                             
                             return (
                               <TableCell key={size} sx={{
-                                color: isDone ? '#16a34a' : (hasOrder ? '#dc2626' : '#cbd5e1'),
+                                color: isDone ? '#16a34a' : (hasOrder ? '#dc2626' : '#94a3b8'),
                                 fontWeight: hasOrder ? 800 : 400,
-                                bgcolor: isDone ? '#dcfce7 !important' : 'transparent',
+                                bgcolor: isDone ? '#dcfce7 !important' : (hasOrder ? 'transparent' : '#f1f5f9'),
                                 minWidth: 45
                               }}>
-                                {!hasOrder ? '—' : (isDone ? 'Ok' : val)}
+                                {!hasOrder ? '' : (isDone ? 'Ok' : val)}
                               </TableCell>
                             );
                           })}
