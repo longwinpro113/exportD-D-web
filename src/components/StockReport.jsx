@@ -164,18 +164,18 @@ const StockReport = () => {
         <Table size="small" sx={{
           minWidth: 2400, // Tăng nhẹ minWidth để chứa cột thời gian mới
           borderCollapse: 'separate',
-          borderSpacing: 0, 
-          '& th, & td': { 
-            borderBottom: '1px solid #f1f5f9', 
-            borderRight: '1px solid #f1f5f9', 
-            px: 1, 
+          borderSpacing: 0,
+          '& th, & td': {
+            borderBottom: '1px solid #f1f5f9',
+            borderRight: '1px solid #f1f5f9',
+            px: 1,
             textAlign: 'center',
             whiteSpace: 'nowrap'
           }
         }}>
           <TableHead>
             <TableRow>
-              {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+              {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
                 <TableCell key={h} sx={{
                   bgcolor: i >= 5 && i <= 8 ? '#f1f7ff' : '#f8fafc',
                   fontWeight: 800, fontSize: '0.82rem',
@@ -189,7 +189,7 @@ const StockReport = () => {
                 }}>{h}</TableCell>
               ))}
               {sizes.map(size => (
-                <TableCell key={size} sx={{ 
+                <TableCell key={size} sx={{
                   bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, zIndex: 1,
                   minWidth: 45, width: 45, maxWidth: 45, p: '0 !important'
                 }}>{size}</TableCell>
@@ -222,15 +222,15 @@ const StockReport = () => {
                       <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name}</TableCell>
                       <TableCell sx={{ ...cellStyle, color: '#1976d2', fontWeight: 700 }}>{row.total_quantity}</TableCell>
                       <TableCell sx={{ ...cellStyle, color: '#7c3aed', fontWeight: 700 }}>{row.accumulated_total}</TableCell>
-                      {/* <TableCell sx={{ ...cellStyle, color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity}</TableCell> */}
+                      <TableCell sx={{ ...cellStyle, color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity}</TableCell>
                       <TableCell sx={{ ...cellStyle, fontWeight: 600, color: row.remaining_quantity <= 0 ? '#16a34a' : '#ef4444' }}>{row.remaining_quantity}</TableCell>
                       <TableCell sx={{ ...cellStyle, bgcolor: status.bg, color: status.color, fontWeight: 800, fontSize: '0.75rem' }}>{status.label}</TableCell>
                       {sizes.map(s => {
                         const val = row[sizeToCol(s)];
                         return (
-                          <TableCell key={s} sx={{ 
+                          <TableCell key={s} sx={{
                             ...cellStyle,
-                            color: val > 0 ? '#334155' : '#94a3b8', 
+                            color: val > 0 ? '#334155' : '#94a3b8',
                             fontWeight: val > 0 ? 800 : 400,
                             bgcolor: val > 0 ? 'transparent' : '#e2e8f0',
                             minWidth: 45, width: 45, maxWidth: 45, p: '0 !important'
