@@ -7,6 +7,8 @@ import {
 } from '@mui/material';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import ReportHeader from './common/ReportHeader';
 import useQuery from '../hooks/useQuery';
 import useFetchList from '../hooks/useFetchList';

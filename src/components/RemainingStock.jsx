@@ -100,16 +100,20 @@ const RemainingStock = () => {
                             {isOk ? 'OK' : 'Not OK'}
                           </TableCell>
                           {sizes.map(size => {
-                            const val = row[sizeToCol(size)];
-                            const hasOrder = parseFloat(row[`order_${sizeToCol(size)}`]) > 0;
+                            const sc = sizeToCol(size);
+                            const val = row[sc];
+                            const originalQty = parseFloat(row['os' + sc]) || 0;
+                            const hasOrder = originalQty > 0;
                             const isDone = hasOrder && val <= 0;
+                            
                             return (
                               <TableCell key={size} sx={{
-                                color: isDone ? '#16a34a' : (!hasOrder ? '#cbd5e1' : '#ef4444'),
+                                color: isDone ? '#16a34a' : (hasOrder ? '#dc2626' : '#cbd5e1'),
                                 fontWeight: hasOrder ? 800 : 400,
-                                bgcolor: isDone ? '#dcfce7' : 'transparent'
+                                bgcolor: isDone ? '#dcfce7 !important' : 'transparent',
+                                minWidth: 45
                               }}>
-                                {!hasOrder ? '—' : (isDone ? 'OK' : val)}
+                                {!hasOrder ? '—' : (isDone ? 'Ok' : val)}
                               </TableCell>
                             );
                           })}
