@@ -35,7 +35,7 @@ const RemainingStock = () => {
       }}>
 
         <ReportHeader
-          title="CHI TIẾT HÀNG CÒN NỢ (REMAINING STOCK)"
+          title="CHI TIẾT HÀNG CÒN NỢ"
           placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
           onSearch={(t) => updateQuery({ q: t })}
           loading={loading}
@@ -60,8 +60,8 @@ const RemainingStock = () => {
                       fontWeight: 800, fontSize: '0.82rem',
                       position: 'sticky', top: 0,
                       left: i === 0 ? 0 : i === 1 ? '50px' : 'auto',
-                      width: i === 0 ? '50px' : i === 1 ? '150px' : 'auto',
-                      minWidth: i === 0 ? '50px' : i === 1 ? '150px' : 'auto',
+                      width: i === 0 ? '50px' : i === 1 ? '150px' : i === 2 ? '70px' : i === 3 ? '80px' : i === 4 ? '180px' : (i >= 5 && i <= 8) ? '95px' : '110px',
+                      minWidth: i === 0 ? '50px' : i === 1 ? '150px' : i === 2 ? '70px' : i === 3 ? '80px' : i === 4 ? '180px' : (i >= 5 && i <= 8) ? '95px' : '110px',
                       zIndex: i <= 1 ? 12 : 2,
                       borderRight: i === 1 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
                       boxShadow: i === 1 ? '2px 0 5px -2px rgba(0,0,0,0.1)' : 'none'
@@ -80,7 +80,7 @@ const RemainingStock = () => {
                 {tableData.map((group, groupIdx) => (
                   <React.Fragment key={groupIdx}>
                     <TableRow>
-                      <TableCell colSpan={12 + sizes.length} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0.5 }}>
+                      <TableCell colSpan={12 + sizes.length} sx={{ bgcolor: '#fff7ed', textAlign: 'left !important', py: 0.5 }}>
                         <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, position: 'sticky', left: '60px' }}>
                           <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#c2410c' }} />
                           <Typography sx={{ fontWeight: 700, color: '#c2410c', fontSize: '0.85rem' }}>{group.date}</Typography>
@@ -99,8 +99,9 @@ const RemainingStock = () => {
                           <TableCell sx={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name || ''}</TableCell>
                           <TableCell sx={{ color: '#1976d2', fontWeight: 600 }}>{row.total_quantity}</TableCell>
                           <TableCell sx={{ color: '#6366f1', fontWeight: 600 }}>{row.accumulated_total}</TableCell>
+                          <TableCell sx={{ color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity || 0}</TableCell>
                           <TableCell sx={{ color: '#ea580c', fontWeight: 800 }}>{row.remaining_quantity}</TableCell>
-                          <TableCell sx={{ bgcolor: isOk ? '#dcfce7 !important' : '#fee2e2 !important', color: isOk ? '#16a34a !important' : '#dc2626 !important', fontWeight: 800 }}>
+                          <TableCell sx={{ bgcolor: isOk ? '#dcfce7 !important' : '#fee2e2 !important', color: isOk ? '#16a34a !important' : '#dc2626 !important', fontWeight: 800, fontSize: '0.75rem' }}>
                             {isOk ? 'OK' : 'Not OK'}
                           </TableCell>
                           {sizes.map(size => {
