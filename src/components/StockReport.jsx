@@ -180,9 +180,9 @@ const StockReport = () => {
                   bgcolor: i >= 5 && i <= 8 ? '#f1f7ff' : '#f8fafc',
                   fontWeight: 800, fontSize: '0.82rem',
                   position: 'sticky', top: 0,
-                  left: i === 0 ? 0 : i === 1 ? '50px' : 'auto',
-                  width: i === 0 ? '50px' : i === 1 ? '150px' : 'auto',
-                  minWidth: i === 0 ? '50px' : i === 1 ? '150px' : 'auto',
+                  left: i === 0 ? 0 : i === 1 ? '40px' : 'auto',
+                  width: i === 0 ? '40px' : i === 1 ? '120px' : i === 2 ? '60px' : i === 3 ? '80px' : i === 4 ? '130px' : '75px',
+                  minWidth: i === 0 ? '40px' : i === 1 ? '120px' : i === 2 ? '60px' : i === 3 ? '80px' : i === 4 ? '130px' : '75px',
                   zIndex: i <= 1 ? 12 : 2,
                   borderRight: i === 1 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
                   boxShadow: i === 1 ? '2px 0 5px -2px rgba(0,0,0,0.1)' : 'none'
@@ -203,23 +203,30 @@ const StockReport = () => {
             {tableData.map((group, gIdx) => (
               <React.Fragment key={gIdx}>
                 <TableRow>
-                  <TableCell colSpan={10} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderRight: '1px solid #cbd5e1' }}>
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, position: 'sticky', left: '60px' }}>
-                      <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#1976d2' }} />
-                      <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.85rem' }}>{group.date}</Typography>
+                  <TableCell colSpan={sizes.length + 12} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderBottom: '1px solid #cbd5e1' }}>
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 3, position: 'sticky', left: '60px' }}>
+                      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+                        <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#1976d2' }} />
+                        <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.85rem' }}>{group.date}</Typography>
+                      </Box>
+                      <Button 
+                        size="small" variant="outlined" color="primary" 
+                        sx={{ height: 24, fontSize: '0.7rem', fontWeight: 600, bgcolor: 'white', px: 1, '&:hover': { bgcolor: '#f8fafc' } }} 
+                        onClick={() => exportStockReportPdf(group, sizes)}>
+                        Xuất PDF
+                      </Button>
                     </Box>
                   </TableCell>
-                  <TableCell colSpan={sizes.length + 2} sx={{ bgcolor: '#e2e8f0', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }} />
                 </TableRow>
                 {group.rows.map((row, rIdx) => {
                   const status = getStatus(row.remaining_quantity);
                   return (
                     <TableRow key={row.id} hover>
-                      <TableCell sx={{ ...cellStyle, position: 'sticky', left: 0, bgcolor: 'white', zIndex: 5, width: '50px', fontWeight: 800 }}>{rIdx + 1}</TableCell>
-                      <TableCell sx={{ ...cellStyle, position: 'sticky', left: '50px', bgcolor: 'white', zIndex: 5, fontWeight: 800, borderRight: '2px solid #e2e8f0', width: '150px' }}>{row.ry_number}</TableCell>
+                      <TableCell sx={{ ...cellStyle, position: 'sticky', left: 0, bgcolor: 'white', zIndex: 5, width: '40px', fontWeight: 800 }}>{rIdx + 1}</TableCell>
+                      <TableCell sx={{ ...cellStyle, position: 'sticky', left: '40px', bgcolor: 'white', zIndex: 5, fontWeight: 800, borderRight: '2px solid #e2e8f0', width: '120px' }}>{row.ry_number}</TableCell>
                       <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D' }}>{row.delivery_round}</TableCell>
-                      <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D' }}>{row.article}</TableCell>
-                      <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name}</TableCell>
+                      <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article}</TableCell>
+                      <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name}</TableCell>
                       <TableCell sx={{ ...cellStyle, color: '#1976d2', fontWeight: 700 }}>{row.total_quantity}</TableCell>
                       <TableCell sx={{ ...cellStyle, color: '#7c3aed', fontWeight: 700 }}>{row.accumulated_total}</TableCell>
                       <TableCell sx={{ ...cellStyle, color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity}</TableCell>

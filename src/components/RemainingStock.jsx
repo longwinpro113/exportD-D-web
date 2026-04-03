@@ -61,8 +61,8 @@ const RemainingStock = () => {
                       fontWeight: 800, fontSize: '0.82rem',
                       position: 'sticky', top: 0,
                       left: i === 0 ? 0 : i === 1 ? '50px' : 'auto',
-                      width: i === 0 ? '50px' : i === 1 ? '150px' : i === 2 ? '70px' : i === 3 ? '80px' : i === 4 ? '180px' : (i >= 5 && i <= 8) ? '95px' : '110px',
-                      minWidth: i === 0 ? '50px' : i === 1 ? '150px' : i === 2 ? '70px' : i === 3 ? '80px' : i === 4 ? '180px' : (i >= 5 && i <= 8) ? '95px' : '110px',
+                      width: i === 0 ? '40px' : i === 1 ? '120px' : i === 2 ? '60px' : i === 3 ? '80px' : i === 4 ? '130px' : '75px',
+                      minWidth: i === 0 ? '40px' : i === 1 ? '120px' : i === 2 ? '60px' : i === 3 ? '80px' : i === 4 ? '130px' : '75px',
                       zIndex: i <= 1 ? 12 : 2,
                       borderRight: i === 1 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
                       boxShadow: i === 1 ? '2px 0 5px -2px rgba(0,0,0,0.1)' : 'none'
@@ -81,13 +81,12 @@ const RemainingStock = () => {
                 {tableData.map((group, groupIdx) => (
                   <React.Fragment key={groupIdx}>
                     <TableRow>
-                      <TableCell colSpan={10} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderRight: '1px solid #cbd5e1' }}>
+                      <TableCell colSpan={sizes.length + 9} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderRight: '1px solid #cbd5e1' }}>
                         <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, position: 'sticky', left: '60px' }}>
                           <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#1976d2' }} />
                           <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.85rem' }}>{group.date}</Typography>
                         </Box>
                       </TableCell>
-                      <TableCell colSpan={sizes.length} sx={{ bgcolor: '#e2e8f0', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }} />
                     </TableRow>
 
                     {group.rows.map((row, rowIdx) => {
@@ -95,10 +94,10 @@ const RemainingStock = () => {
                       return (
                         <TableRow key={row.ry_number + rowIdx} hover>
                           <TableCell sx={{ ...cellStyle, position: 'sticky', left: 0, bgcolor: 'white', zIndex: 1, color: '#94a3b8' }}>{rowIdx + 1}</TableCell>
-                          <TableCell sx={{ ...cellStyle, position: 'sticky', left: 50, bgcolor: 'white', zIndex: 1, fontWeight: 800, borderRight: '2px solid #e2e8f0' }}>{row.ry_number}</TableCell>
+                          <TableCell sx={{ ...cellStyle, position: 'sticky', left: 40, bgcolor: 'white', zIndex: 1, fontWeight: 800, borderRight: '2px solid #e2e8f0' }}>{row.ry_number}</TableCell>
                           <TableCell sx={cellStyle}>{row.delivery_round || ''}</TableCell>
-                          <TableCell sx={{ ...cellStyle, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article || ''}</TableCell>
-                          <TableCell sx={{ ...cellStyle, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name || ''}</TableCell>
+                          <TableCell sx={{ ...cellStyle, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article || ''}</TableCell>
+                          <TableCell sx={{ ...cellStyle, maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name || ''}</TableCell>
                           <TableCell sx={{ ...cellStyle, color: '#1976d2', fontWeight: 600 }}>{row.total_quantity}</TableCell>
                           <TableCell sx={{ ...cellStyle, color: '#6366f1', fontWeight: 600 }}>{row.accumulated_total}</TableCell>
                           <TableCell sx={{ ...cellStyle, color: '#ea580c', fontWeight: 800 }}>{row.remaining_quantity}</TableCell>
