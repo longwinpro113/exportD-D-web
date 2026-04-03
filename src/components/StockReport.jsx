@@ -6,12 +6,14 @@ import {
   Button, Divider, TextField
 } from '@mui/material';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import ReportHeader from './common/ReportHeader';
 import useQuery from '../hooks/useQuery';
 import useFetchList from '../hooks/useFetchList';
+import { exportStockReportPdf } from '../utils/pdfExport';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 // const API_URL = "http://localhost:5000";
@@ -204,17 +206,15 @@ const StockReport = () => {
               <React.Fragment key={gIdx}>
                 <TableRow>
                   <TableCell colSpan={sizes.length + 12} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderBottom: '1px solid #cbd5e1' }}>
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 3, position: 'sticky', left: '60px' }}>
-                      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
-                        <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#1976d2' }} />
-                        <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.85rem' }}>{group.date}</Typography>
-                      </Box>
-                      <Button 
-                        size="small" variant="outlined" color="primary" 
-                        sx={{ height: 24, fontSize: '0.7rem', fontWeight: 600, bgcolor: 'white', px: 1, '&:hover': { bgcolor: '#f8fafc' } }} 
-                        onClick={() => exportStockReportPdf(group, sizes)}>
-                        Xuất PDF
-                      </Button>
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, position: 'sticky', left: '40px', width: '120px', justifyContent: 'center' }}>
+                      <CalendarTodayOutlinedIcon sx={{ fontSize: '0.85rem', color: '#1976d2' }} />
+                      <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.8rem' }}>{group.date}</Typography>
+                      <IconButton 
+                        size="small" 
+                        onClick={() => exportStockReportPdf(group, sizes)}
+                        sx={{ color: '#1976d2', p: 0.5 }}>
+                        <PrintOutlinedIcon sx={{ fontSize: '1.1rem' }} />
+                      </IconButton>
                     </Box>
                   </TableCell>
                 </TableRow>

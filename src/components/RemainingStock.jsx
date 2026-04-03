@@ -2,12 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import dayjs from 'dayjs';
 import {
   Box, Paper, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Typography
+  TableHead, TableRow, Typography, IconButton
 } from '@mui/material';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import ReportHeader from './common/ReportHeader';
 import useQuery from '../hooks/useQuery';
 import useFetchList from '../hooks/useFetchList';
+import { exportStockReportPdf } from '../utils/pdfExport';
 
 const buildSizes = () => {
   const s = [];
@@ -82,9 +84,15 @@ const RemainingStock = () => {
                   <React.Fragment key={groupIdx}>
                     <TableRow>
                       <TableCell colSpan={sizes.length + 9} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderRight: '1px solid #cbd5e1' }}>
-                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, position: 'sticky', left: '60px' }}>
-                          <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#1976d2' }} />
-                          <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.85rem' }}>{group.date}</Typography>
+                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, position: 'sticky', left: '40px', width: '120px', justifyContent: 'center' }}>
+                          <CalendarTodayOutlinedIcon sx={{ fontSize: '0.85rem', color: '#1976d2' }} />
+                          <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.8rem' }}>{group.date}</Typography>
+                          <IconButton 
+                            size="small" 
+                            onClick={() => exportStockReportPdf(group, sizes)}
+                            sx={{ color: '#1976d2', p: 0.5 }}>
+                            <PrintOutlinedIcon sx={{ fontSize: '1.1rem' }} />
+                          </IconButton>
                         </Box>
                       </TableCell>
                     </TableRow>
