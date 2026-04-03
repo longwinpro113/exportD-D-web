@@ -212,8 +212,8 @@ const StockReport = () => {
                   const status = getStatus(row.remaining_quantity);
                   return (
                     <TableRow key={row.id} hover>
-                      <TableCell sx={{ position: 'sticky', left: 0, bgcolor: 'white', zIndex: 5, width: '50px', minWidth: '50px', fontWeight: 800 }}>{rIdx + 1}</TableCell>
-                      <TableCell sx={{ position: 'sticky', left: '50px', bgcolor: 'white', zIndex: 5, fontWeight: 800, borderRight: '2px solid #e2e8f0', width: '150px', minWidth: '150px' }}>{row.ry_number}</TableCell>
+                      <TableCell sx={{ position: 'sticky', left: 0, bgcolor: 'white', zIndex: 5, width: '50px', fontWeight: 800 }}>{rIdx + 1}</TableCell>
+                      <TableCell sx={{ position: 'sticky', left: '50px', bgcolor: 'white', zIndex: 5, fontWeight: 800, borderRight: '2px solid #e2e8f0', width: '150px' }}>{row.ry_number}</TableCell>
                       <TableCell sx={{ fontWeight: 800, color: '#DAA06D' }}>{row.delivery_round}</TableCell>
                       <TableCell sx={{ fontWeight: 800, color: '#DAA06D' }}>{row.article}</TableCell>
                       <TableCell sx={{ fontWeight: 800, color: '#DAA06D', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name}</TableCell>
