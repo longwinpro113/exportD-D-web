@@ -12,7 +12,8 @@ const ReportHeader = React.memo(({ title, sender, receiver, placeholder, onSearc
       onSearch(localSearch);
     }, 500);
     return () => clearTimeout(timer);
-  }, [localSearch, onSearch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localSearch]);
 
   return (
     <Box sx={{ p: 2.5, pb: 2 }}>
