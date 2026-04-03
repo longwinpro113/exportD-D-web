@@ -16,6 +16,7 @@ const buildSizes = () => {
 };
 const sizes = buildSizes();
 const sizeToCol = (size) => `s${size.toString().replace('.', '_')}`;
+const cellStyle = { color: '#1e293b', fontSize: '0.85rem', height: 38, borderRight: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' };
 
 const RemainingStock = () => {
   const [query, updateQuery] = useQuery({ q: '' });
@@ -34,12 +35,11 @@ const RemainingStock = () => {
         display: 'flex', flexDirection: 'column', border: '1px solid #e2e8f0', overflow: 'hidden'
       }}>
 
-        <ReportHeader 
-          title="CHI TIẾT HÀNG CÒN NỢ" 
-          receiver={tableData[0]?.rows[0]?.client || "Công Ty Lạc Tỷ"}
-          placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..." 
-          onSearch={(t) => updateQuery({ q: t })} 
-          loading={loading} 
+        <ReportHeader
+          title="CHI TIẾT HÀNG CÒN NỢ"
+          placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
+          onSearch={(t) => updateQuery({ q: t })}
+          loading={loading}
         />
 
         <Box sx={{ flex: 1, borderTop: '1px solid #e2e8f0', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -47,7 +47,7 @@ const RemainingStock = () => {
             <Table size="small" sx={{
               minWidth: 2800, borderCollapse: 'separate', borderSpacing: 0,
               '& th, & td': {
-                border: '1px solid #e2e8f0',
+                border: '1px solid #f1f5f9',
                 py: 0.6, px: 1,
                 textAlign: 'center',
                 whiteSpace: 'nowrap'
@@ -81,29 +81,29 @@ const RemainingStock = () => {
                 {tableData.map((group, groupIdx) => (
                   <React.Fragment key={groupIdx}>
                     <TableRow>
-                      <TableCell colSpan={10} sx={{ bgcolor: '#fff7ed', textAlign: 'left !important', py: 0.5, borderBottom: '1px solid #e2e8f0' }}>
+                      <TableCell colSpan={10} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderRight: 'none' }}>
                         <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, position: 'sticky', left: '60px' }}>
-                          <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#c2410c' }} />
-                          <Typography sx={{ fontWeight: 700, color: '#c2410c', fontSize: '0.85rem' }}>{group.date}</Typography>
+                          <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#1976d2' }} />
+                          <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.85rem' }}>{group.date}</Typography>
                         </Box>
                       </TableCell>
-                      <TableCell colSpan={sizes.length} sx={{ bgcolor: '#e2e8f0', p: 0, borderBottom: '1px solid #e2e8f0' }} />
+                      <TableCell colSpan={sizes.length} sx={{ bgcolor: 'white', borderBottom: '1px solid #f1f5f9' }} />
                     </TableRow>
 
                     {group.rows.map((row, rowIdx) => {
                       const isOk = (parseFloat(row.remaining_quantity) || 0) <= 0;
                       return (
                         <TableRow key={row.ry_number + rowIdx} hover>
-                          <TableCell sx={{ position: 'sticky', left: 0, bgcolor: 'white', zIndex: 1, color: '#94a3b8' }}>{rowIdx + 1}</TableCell>
-                          <TableCell sx={{ position: 'sticky', left: 50, bgcolor: 'white', zIndex: 1, fontWeight: 800, borderRight: '2px solid #e2e8f0' }}>{row.ry_number}</TableCell>
-                          <TableCell>{row.delivery_round || ''}</TableCell>
-                          <TableCell sx={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article || ''}</TableCell>
-                          <TableCell sx={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name || ''}</TableCell>
-                          <TableCell sx={{ color: '#1976d2', fontWeight: 600 }}>{row.total_quantity}</TableCell>
-                          <TableCell sx={{ color: '#6366f1', fontWeight: 600 }}>{row.accumulated_total}</TableCell>
-                          <TableCell sx={{ color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity || 0}</TableCell>
-                          <TableCell sx={{ color: '#ea580c', fontWeight: 800 }}>{row.remaining_quantity}</TableCell>
-                          <TableCell sx={{ bgcolor: isOk ? '#dcfce7 !important' : '#fee2e2 !important', color: isOk ? '#16a34a !important' : '#dc2626 !important', fontWeight: 800, fontSize: '0.75rem' }}>
+                          <TableCell sx={{ ...cellStyle, position: 'sticky', left: 0, bgcolor: 'white', zIndex: 1, color: '#94a3b8' }}>{rowIdx + 1}</TableCell>
+                          <TableCell sx={{ ...cellStyle, position: 'sticky', left: 50, bgcolor: 'white', zIndex: 1, fontWeight: 800, borderRight: '2px solid #e2e8f0' }}>{row.ry_number}</TableCell>
+                          <TableCell sx={cellStyle}>{row.delivery_round || ''}</TableCell>
+                          <TableCell sx={{ ...cellStyle, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article || ''}</TableCell>
+                          <TableCell sx={{ ...cellStyle, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name || ''}</TableCell>
+                          <TableCell sx={{ ...cellStyle, color: '#1976d2', fontWeight: 600 }}>{row.total_quantity}</TableCell>
+                          <TableCell sx={{ ...cellStyle, color: '#6366f1', fontWeight: 600 }}>{row.accumulated_total}</TableCell>
+                          <TableCell sx={{ ...cellStyle, color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity || 0}</TableCell>
+                          <TableCell sx={{ ...cellStyle, color: '#ea580c', fontWeight: 800 }}>{row.remaining_quantity}</TableCell>
+                          <TableCell sx={{ ...cellStyle, bgcolor: isOk ? '#dcfce7 !important' : '#fee2e2 !important', color: isOk ? '#16a34a !important' : '#dc2626 !important', fontWeight: 800, fontSize: '0.75rem' }}>
                             {isOk ? 'OK' : 'Not OK'}
                           </TableCell>
                           {sizes.map(size => {
@@ -115,9 +115,10 @@ const RemainingStock = () => {
 
                             return (
                               <TableCell key={size} sx={{
+                                ...cellStyle,
                                 color: isDone ? '#16a34a' : (hasOrder ? '#dc2626' : '#94a3b8'),
                                 fontWeight: hasOrder ? 800 : 400,
-                                bgcolor: isDone ? '#dcfce7 !important' : (hasOrder ? 'transparent' : '#e2e8f0'),
+                                bgcolor: isDone ? '#dcfce7 !important' : (hasOrder ? 'transparent' : '#f1f5f9'),
                                 minWidth: 45, width: 45, maxWidth: 45, p: '0 !important'
                               }}>
                                 {!hasOrder ? '' : (isDone ? 'Ok' : val)}

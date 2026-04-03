@@ -27,7 +27,6 @@ const EntryForm = () => {
     const [formData, setFormData] = useState({
         ngayGiao: null,
         donHang: '',
-        client: '',
         article: '',
         modelName: '',
         totalQuantity: '',
@@ -43,18 +42,17 @@ const EntryForm = () => {
             setFormData(prev => ({
                 ...prev,
                 donHang: newValue.ry_number || '',
-                client: newValue.client || '',
                 article: newValue.article || '',
                 modelName: newValue.model_name || '',
                 totalQuantity: newValue.total_order_qty || ''
             }));
         } else {
-            setFormData(prev => ({ ...prev, donHang: '', client: '', article: '', modelName: '', totalQuantity: '' }));
+            setFormData(prev => ({ ...prev, donHang: '', article: '', modelName: '', totalQuantity: '' }));
         }
     };
 
     const handleReset = () => {
-        setFormData({ ngayGiao: null, donHang: '', client: '', article: '', modelName: '', totalQuantity: '', sizeValues: {} });
+        setFormData({ ngayGiao: null, donHang: '', article: '', modelName: '', totalQuantity: '', sizeValues: {} });
     };
 
     const handleSave = async () => {
@@ -78,7 +76,6 @@ const EntryForm = () => {
             const payload = {
                 export_date,
                 ry_number: formData.donHang,
-                client: formData.client,
                 ...sizePayload
             };
 
@@ -130,8 +127,8 @@ const EntryForm = () => {
                 {/* Header Row: Date & Order Info */}
                 <Box sx={{
                     display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(5, 1fr)' },
-                    gap: { xs: 2, md: 2 },
+                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(4, 1fr)' },
+                    gap: { xs: 2, md: 4 },
                     width: '100%',
                     mb: 1
                 }}>
@@ -187,14 +184,6 @@ const EntryForm = () => {
                                 '&.Mui-focused fieldset': { borderColor: '#000000', borderWidth: '2px' },
                             }
                         }}
-                    />
-
-                    <TextField 
-                        fullWidth 
-                        label="Khách hàng" 
-                        value={formData.client} 
-                        onChange={(e) => setFormData(prev => ({ ...prev, client: e.target.value }))}
-                        sx={inputSx}
                     />
 
                     <TextField fullWidth label="Article" disabled value={formData.article}
