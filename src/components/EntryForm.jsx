@@ -86,8 +86,12 @@ const EntryForm = () => {
             setSnackbar({ open: true, message: 'Lưu thành công.', severity: 'success' });
             handleReset();
         } catch (err) {
-            console.error('Save error:', err.message);
-            setSnackbar({ open: true, message: `Lưu thất bại: ${err.message}`, severity: 'error' });
+            let errorMsg = err.message;
+            if (err.message === 'Failed to fetch') {
+                errorMsg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra API URL hoặc mạng.';
+            }
+            console.error('Save error details:', err);
+            setSnackbar({ open: true, message: `Lưu thất bại: ${errorMsg}`, severity: 'error' });
         } finally {
             setSaving(false);
         }
@@ -230,7 +234,7 @@ const EntryForm = () => {
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             borderRadius: '8px',
-                                            bgcolor: (formData.sizeValues[size] && formData.sizeValues[size] !== '0') ? '#ffffff' : '#cbd5e1'
+                                            bgcolor: (formData.sizeValues[size] && formData.sizeValues[size] !== '0') ? '#ffffff' : '#e2e8f0'
                                         }
                                     }}
                                 />

@@ -1,5 +1,4 @@
-const API_URL = "http://localhost:5000";
-// const API_URL = "https://exportd-d-api.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export const fetchOrders = async () => {
     const res = await fetch(`${API_URL}/api/orders`);

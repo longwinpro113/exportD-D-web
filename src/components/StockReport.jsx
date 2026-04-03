@@ -24,7 +24,7 @@ const buildSizes = () => {
 
 const sizes = buildSizes();
 const sizeToCol = (size) => `s${size.toString().replace('.', '_')}`;
-const cellStyle = { color: '#1e293b', fontSize: '0.85rem', height: 38, borderRight: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' };
+const cellStyle = { color: '#1e293b', fontSize: '0.85rem', height: 38, borderRight: '1px solid #cbd5e1', borderBottom: '1px solid #cbd5e1' };
 
 // Hàm convert sang ngày giờ Việt Nam
 const formatVietnameseDateTime = (dateString) => {
@@ -203,13 +203,13 @@ const StockReport = () => {
             {tableData.map((group, gIdx) => (
               <React.Fragment key={gIdx}>
                 <TableRow>
-                  <TableCell colSpan={10} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderRight: 'none' }}>
+                  <TableCell colSpan={10} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderRight: '1px solid #cbd5e1' }}>
                     <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, position: 'sticky', left: '60px' }}>
                       <CalendarTodayOutlinedIcon sx={{ fontSize: '0.9rem', color: '#1976d2' }} />
                       <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.85rem' }}>{group.date}</Typography>
                     </Box>
                   </TableCell>
-                  <TableCell colSpan={sizes.length + 2} sx={{ bgcolor: 'white', borderBottom: '1px solid #f1f5f9' }} />
+                  <TableCell colSpan={sizes.length + 2} sx={{ bgcolor: '#e2e8f0', borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }} />
                 </TableRow>
                 {group.rows.map((row, rIdx) => {
                   const status = getStatus(row.remaining_quantity);
@@ -232,7 +232,7 @@ const StockReport = () => {
                             ...cellStyle,
                             color: val > 0 ? '#334155' : '#94a3b8', 
                             fontWeight: val > 0 ? 800 : 400,
-                            bgcolor: val > 0 ? 'transparent' : '#f1f5f9',
+                            bgcolor: val > 0 ? 'transparent' : '#e2e8f0',
                             minWidth: 45, width: 45, maxWidth: 45, p: '0 !important'
                           }}>
                             {val > 0 ? val : ''}
