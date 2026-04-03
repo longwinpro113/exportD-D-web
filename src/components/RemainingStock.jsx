@@ -62,7 +62,7 @@ const RemainingStock = () => {
                       position: 'sticky', top: 0, 
                       left: i === 0 ? 0 : i === 1 ? 50 : 'auto',
                       zIndex: i <= 1 ? 12 : 2,
-                      minWidth: i === 0 ? 50 : i === 1 ? 150 : (i >= 5 ? 110 : 100),
+                      minWidth: i === 0 ? 50 : i === 1 ? 150 : (i >= 5 ? 110 : 'auto'),
                       borderRight: i === 1 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
                       boxShadow: i === 1 ? '2px 0 5px -1px rgba(0,0,0,0.1)' : 'none'
                     }}>{h}</TableCell>
@@ -96,15 +96,15 @@ const RemainingStock = () => {
                       const isOk = (parseFloat(row.remaining_quantity) || 0) <= 0;
                       return (
                         <TableRow key={row.ry_number + rowIdx} hover>
-                          <TableCell sx={{ position: 'sticky', left: 0, bgcolor: 'white', zIndex: 1, color: '#94a3b8' }}>{rowIdx + 1}</TableCell>
-                           <TableCell sx={{ position: 'sticky', left: 50, bgcolor: 'white', zIndex: 1, fontWeight: 800, borderRight: '2px solid #e2e8f0' }}>{row.ry_number}</TableCell>
+                          <TableCell sx={{ position: 'sticky', left: 0, bgcolor: 'white', zIndex: 1, color: '#94a3b8', width: 50, minWidth: 50 }}>{rowIdx + 1}</TableCell>
+                           <TableCell sx={{ position: 'sticky', left: 50, bgcolor: 'white', zIndex: 1, fontWeight: 800, borderRight: '2px solid #e2e8f0', width: 150, minWidth: 150 }}>{row.ry_number}</TableCell>
                           <TableCell>{row.delivery_round || ''}</TableCell>
                           <TableCell sx={{ maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article || ''}</TableCell>
                           <TableCell sx={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name || ''}</TableCell>
-                          <TableCell sx={{ color: '#1976d2', fontWeight: 600 }}>{row.total_quantity}</TableCell>
-                          <TableCell sx={{ color: '#6366f1', fontWeight: 600 }}>{row.accumulated_total}</TableCell>
-                          <TableCell sx={{ color: '#ea580c', fontWeight: 800 }}>{row.remaining_quantity}</TableCell>
-                          <TableCell sx={{ bgcolor: isOk ? '#dcfce7 !important' : '#fee2e2 !important', color: isOk ? '#16a34a !important' : '#dc2626 !important', fontWeight: 800 }}>
+                          <TableCell sx={{ color: '#1976d2', fontWeight: 600, width: 110, minWidth: 110 }}>{row.total_quantity}</TableCell>
+                          <TableCell sx={{ color: '#6366f1', fontWeight: 600, width: 110, minWidth: 110 }}>{row.accumulated_total}</TableCell>
+                          <TableCell sx={{ color: '#ea580c', fontWeight: 800, width: 110, minWidth: 110 }}>{row.remaining_quantity}</TableCell>
+                          <TableCell sx={{ bgcolor: isOk ? '#dcfce7 !important' : '#fee2e2 !important', color: isOk ? '#16a34a !important' : '#dc2626 !important', fontWeight: 800, width: 110, minWidth: 110 }}>
                             {isOk ? 'OK' : 'Not OK'}
                           </TableCell>
                           {sizes.map(size => {
