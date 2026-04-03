@@ -11,10 +11,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
-// require
-
-const API_URL = import.meta.env.VITE_API_URL;
-// const API_URL = "http://localhost:5000";
+import { exportOrder } from '../services/api';
+import useFetchList from '../hooks/useFetchList';
 
 const buildSizes = () => {
     const s = [];
@@ -35,26 +33,9 @@ const EntryForm = () => {
         sizeValues: {}
     });
 
-    const [orderOptions, setOrderOptions] = useState([]);
-    const [loadingOrders, setLoadingOrders] = useState(false);
+    const [orderOptions, loadingOrders] = useFetchList('/api/orders', {});
     const [saving, setSaving] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-
-    useEffect(() => {
-        const fetchOrders = async () => {
-            setLoadingOrders(true);
-            try {
-                const res = await fetch(`${API_URL}/api/orders`);
-                const data = await res.json();
-                if (Array.isArray(data)) setOrderOptions(data);
-            } catch (err) {
-                console.error('Failed to load orders:', err.message);
-            } finally {
-                setLoadingOrders(false);
-            }
-        };
-        fetchOrders();
-    }, []);
 
     const handleOrderChange = (event, newValue) => {
         if (newValue && typeof newValue === 'object') {
@@ -100,16 +81,7 @@ const EntryForm = () => {
 
             console.log("Payload: ", payload)
 
-            const res = await fetch(`${API_URL}/api/export`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || 'Lưu thất bại');
-            }
+            await exportOrder(payload);
 
             setSnackbar({ open: true, message: 'Lưu thành công.', severity: 'success' });
             handleReset();

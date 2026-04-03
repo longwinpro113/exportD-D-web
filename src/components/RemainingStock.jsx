@@ -5,10 +5,9 @@ import {
   TableHead, TableRow, Typography 
 } from '@mui/material';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
-import RemainingHeader from './RemainingHeader/RemainingHeader';
-
-const API_URL = import.meta.env.VITE_API_URL;
-console.log("API URL", API_URL);
+import ReportHeader from './common/ReportHeader';
+import useQuery from '../hooks/useQuery';
+import useFetchList from '../hooks/useFetchList';
 
 const buildSizes = () => {
   const s = [];
@@ -19,38 +18,14 @@ const sizes = buildSizes();
 const sizeToCol = (size) => `s${size.toString().replace('.', '_')}`;
 
 const RemainingStock = () => {
-  const [tableData, setTableData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [query, updateQuery] = useQuery({ q: '' });
+  const [data, loading] = useFetchList('/api/remaining-stock', query);
 
-  const isDateSearch = (s) => /^\d{1,2}\/\d{1,2}(\/\d{2,4})?$/.test(s.trim());
-
-  const fetchData = useCallback(async (search) => {
-    setLoading(true);
-    let url = `${API_URL}/api/remaining-stock`;
-    const trimmed = search.trim();
-    
-    if (trimmed) {
-      if (isDateSearch(trimmed)) url += `?date=${encodeURIComponent(trimmed)}`;
-      else if (trimmed.toLowerCase().startsWith('d:')) url += `?round=${encodeURIComponent(trimmed.slice(2).trim())}`;
-      else url += `?ry_number=${encodeURIComponent(trimmed)}&any=${encodeURIComponent(trimmed)}`;
-    }
-
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      const displayDate = isDateSearch(trimmed) ? trimmed : dayjs().format('DD/MM/YYYY');
-      setTableData([{ date: displayDate, rows: Array.isArray(data) ? data : [] }]);
-    } catch (err) {
-      setTableData([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData(searchQuery);
-  }, [searchQuery, fetchData]);
+  const trimmedSearch = (query.q || '').trim();
+  const isDateSearch = trimmedSearch && /^\d{1,2}\/\d{1,2}(\/\d{2,4})?$/.test(trimmedSearch);
+  const displayDate = isDateSearch ? trimmedSearch : dayjs().format('DD/MM/YYYY');
+  
+  const tableData = [{ date: displayDate, rows: Array.isArray(data) ? data : [] }];
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, width: '100%', height: '100%' }}>
@@ -59,7 +34,12 @@ const RemainingStock = () => {
         display: 'flex', flexDirection: 'column', border: '1px solid #e2e8f0', overflow: 'hidden'
       }}>
         
-        <RemainingHeader onSearch={setSearchQuery} loading={loading} />
+        <ReportHeader 
+          title="CHI TIẾT HÀNG CÒN NỢ (REMAINING STOCK)" 
+          placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..." 
+          onSearch={(t) => updateQuery({ q: t })} 
+          loading={loading} 
+        />
 
         <Box sx={{ flex: 1, borderTop: '1px solid #e2e8f0', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <TableContainer sx={{ width: '100%', flex: 1, overflow: 'auto' }}>

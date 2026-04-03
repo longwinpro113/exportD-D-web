@@ -7,14 +7,11 @@ import {
 } from '@mui/material';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import ReportHeader from './common/ReportHeader';
+import useQuery from '../hooks/useQuery';
+import useFetchList from '../hooks/useFetchList';
 
-// Import Header đã tách riêng
-import StockHeader from './StockHeader/StockHeader';
-
-const API_URL = import.meta.env.VITE_API_URL;
-// const API_URL = "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const buildSizes = () => {
   const s = [];
@@ -85,7 +82,7 @@ const EditDialog = ({ open, row, onClose, onSave }) => {
     try {
       const payload = {};
       sizes.forEach(size => { payload[sizeToCol(size)] = parseFloat(form[sizeToCol(size)]) || 0; });
-      const res = await fetch(`${API_URL}/api/export/${row.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/export/${row.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -125,7 +122,8 @@ const DeleteDialog = ({ open, row, onClose, onConfirm }) => {
   const handleConfirm = async () => {
     setDeleting(true);
     try {
-      await fetch(`${API_URL}/api/export/${row.id}`, { method: 'DELETE' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/export/${row.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Update failed');
       onConfirm();
     } finally { setDeleting(false); }
   };
@@ -147,33 +145,12 @@ const DeleteDialog = ({ open, row, onClose, onConfirm }) => {
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 
 const StockReport = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [tableData, setTableData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [query, updateQuery] = useQuery({ q: '' });
   const [editRow, setEditRow] = useState(null);
   const [deleteRow, setDeleteRow] = useState(null);
 
-  const fetchData = useCallback(async (search) => {
-    setLoading(true);
-    let url = `${API_URL}/api/export`;
-    if (search.trim()) {
-      const isDate = /^\d{1,2}\/\d{1,2}/.test(search);
-      url += isDate ? `?date=${encodeURIComponent(search)}` : `?ry_number=${encodeURIComponent(search)}`;
-    }
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      setTableData(Array.isArray(data) ? groupByDate(data) : []);
-    } catch (err) { setTableData([]); } finally { setLoading(false); }
-  }, []);
-
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedSearch(searchTerm), 500);
-    return () => clearTimeout(handler);
-  }, [searchTerm]);
-
-  useEffect(() => { fetchData(debouncedSearch); }, [debouncedSearch, fetchData]);
+  const [data, loading, , refetch] = useFetchList('/api/export', query);
+  const tableData = useMemo(() => Array.isArray(data) ? groupByDate(data) : [], [data]);
 
   const memoizedTable = useMemo(() => {
     if (loading && tableData.length === 0) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}><CircularProgress /></Box>;
@@ -261,15 +238,20 @@ const StockReport = () => {
     <Box sx={{ p: { xs: 2, md: 3 }, width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc', overflow: 'hidden' }}>
       <Paper elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: '12px', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', bgcolor: '#fff' }}>
 
-        <StockHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <ReportHeader
+          title="BIỂU GIAO THÀNH PHẨM QUA CÔNG TY LẠC TỶ"
+          placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
+          onSearch={(t) => updateQuery({ q: t })}
+          loading={loading}
+        />
 
         <Box sx={{ flex: 1, borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {memoizedTable}
         </Box>
       </Paper>
 
-      {editRow && <EditDialog open={!!editRow} row={editRow} onClose={() => setEditRow(null)} onSave={() => { setEditRow(null); fetchData(searchTerm); }} />}
-      {deleteRow && <DeleteDialog open={!!deleteRow} row={deleteRow} onClose={() => setDeleteRow(null)} onConfirm={() => { setDeleteRow(null); fetchData(searchTerm); }} />}
+      {editRow && <EditDialog open={!!editRow} row={editRow} onClose={() => setEditRow(null)} onSave={() => { setEditRow(null); refetch(); }} />}
+      {deleteRow && <DeleteDialog open={!!deleteRow} row={deleteRow} onClose={() => setDeleteRow(null)} onConfirm={() => { setDeleteRow(null); refetch(); }} />}
     </Box>
   );
 };
