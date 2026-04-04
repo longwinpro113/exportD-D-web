@@ -136,7 +136,7 @@ export const exportStockReportPdf = async (group, sizes) => {
                 textColor: [0, 0, 0],
                 fontStyle: 'bold',
                 fontSize: 8,
-                lineWidth: 0        
+                lineWidth: { top: 0.5, bottom: 0, left: 0, right: 0 }     
             },
             columnStyles: {
                 0: { cellWidth: 25 }, // STT
