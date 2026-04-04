@@ -18,34 +18,39 @@ export const exportStockReportPdf = async (group, sizes) => {
                     reader.readAsDataURL(blob);
                 });
                 doc.addFileToVFS('Roboto-Regular.ttf', base64Font);
+                // Map the font to multiple styles so they all use the loaded font
                 doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+                doc.addFont('Roboto-Regular.ttf', 'Roboto', 'bold');
                 doc.setFont('Roboto');
             }
         } catch(e) {
             console.warn("Could not load Vietnamese font, using fallback", e);
         }
 
-        doc.setFontSize(14);
+        doc.setFont('Roboto', 'bold');
+        doc.setFontSize(16);
         doc.text("BIỂU GIAO THÀNH PHẨM QUA CÔNG TY LẠC TỶ", 40, 40);
         
-        doc.setFontSize(9);
+        doc.setFont('Roboto', 'normal');
+        doc.setFontSize(10);
         doc.text("ĐƠN VỊ CHUYỂN: DD (Long An)", 40, 60);
         doc.text("ĐƠN VỊ LÃNH: CÔNG TY LẠC TỶ", 600, 60);
 
         const totalExported = group.rows.reduce((sum, r) => sum + (Number(r.shipped_quantity) || 0), 0);
-        doc.text(`Ngày: ${group.date}`, 40, 80);
-        doc.text(`Tổng giao: ${totalExported}`, 40, 100);
-        doc.text("Ký: T1", 200, 80);
+        doc.text(`Ngày: ${group.date}`, 40, 85);
+        doc.text(`Tổng giao: ${totalExported}`, 40, 105);
+        doc.text("Ký: T1", 280, 85);
 
         doc.setTextColor(0, 51, 204); 
-        doc.text("HÀNG LỆNH", 40, 115);
+        doc.setFont('Roboto', 'bold');
+        doc.text("HÀNG LỆNH", 40, 125);
         doc.setTextColor(0, 0, 0);
 
         const head = [
             [
-                "STT", "ĐƠN HÀNG", "MODEL NAME", "SL\nGIAO", 
+                "STT", "ĐƠN HÀNG", "MODEL NAME", "SL GIAO", 
                 "CÒN LẠI", "ĐƠN VỊ", "ART", 
-                ...sizes, "Ghi chú"
+                ...sizes, "GHI CHÚ"
             ]
         ];
 
@@ -70,27 +75,37 @@ export const exportStockReportPdf = async (group, sizes) => {
         });
 
         autoTable(doc, {
-            startY: 125,
+            startY: 135,
             head: head,
             body: body,
             theme: 'grid',
             styles: {
                 font: 'Roboto',
+                fontStyle: 'normal',
                 fontSize: 7,
-                cellPadding: 2,
+                cellPadding: 3,
                 overflow: 'hidden',
                 valign: 'middle',
                 halign: 'center',
+                lineWidth: 0.2,
+                lineColor: [80, 80, 80]
+            },
+            headStyles: {
+                font: 'Roboto',
+                fontStyle: 'bold',
+                fillColor: [255, 255, 255],
+                textColor: [0, 0, 0],
                 lineWidth: 0.5,
                 lineColor: [0, 0, 0]
             },
-            headStyles: {
-                fillColor: [245, 245, 245],
-                textColor: [0, 0, 0]
-            },
             columnStyles: {
-                1: { cellWidth: 70 }, // ĐƠN HÀNG
-                2: { cellWidth: 'auto', halign: 'left' } // MODEL NAME
+                0: { cellWidth: 25 }, // STT
+                1: { cellWidth: 70, fontStyle: 'bold' }, // ĐƠN HÀNG
+                2: { cellWidth: 'auto', halign: 'left' }, // MODEL NAME
+                3: { cellWidth: 35 }, // SL GIAO
+                4: { cellWidth: 35 }, // CÒN LẠI
+                5: { cellWidth: 35 }, // ĐƠN VỊ
+                6: { cellWidth: 45 }, // ART
             },
             margin: { top: 30, right: 20, bottom: 30, left: 20 }
         });
