@@ -103,6 +103,13 @@ export const exportStockReportPdf = async (group, sizes) => {
             ""              // GHI CHÚ
         ];
 
+        const sizeColumnCount = activeSizes.length;
+
+        const sizeStyles = {};
+        activeSizes.forEach((_, index) => {
+            sizeStyles[7 + index] = { cellWidth: 22 }; 
+        });
+
         // --- 4. Render Table (Điều chỉnh chiều rộng cột ART) ---
         autoTable(doc, {
             startY: 125,
@@ -140,7 +147,8 @@ export const exportStockReportPdf = async (group, sizes) => {
                 4: { cellWidth: 35 }, // CÒN LẠI
                 5: { cellWidth: 30 }, // ĐÔI
                 6: { cellWidth: 50 }, // ART 
-                [8 + activeSizes.length]: { cellWidth: 50, halign: 'left' } // GHI CHÚ
+                ...sizeStyles,
+                [7 + sizeColumnCount]: { cellWidth: 45, halign: 'center' } // GHI CHÚ
             },
             didParseCell: function (data) {
                 if (data.column.index === 4 && data.cell.text[0] === 'OK') {
