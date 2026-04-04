@@ -5,7 +5,7 @@ export const exportStockReportPdf = async (group, sizes) => {
     try {
         const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
         
-        // Load Roboto font to support Vietnamese
+        // --- 1. Load Font (Giữ nguyên phần load font của bạn) ---
         try {
             const fontUrl = "https://unpkg.com/roboto-font@0.1.0/fonts/Roboto/roboto-regular-webfont.ttf";
             const res = await fetch(fontUrl);
@@ -18,18 +18,15 @@ export const exportStockReportPdf = async (group, sizes) => {
                     reader.readAsDataURL(blob);
                 });
                 doc.addFileToVFS('Roboto-Regular.ttf', base64Font);
-                // Map the font to multiple styles so they all use the loaded font
                 doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
                 doc.addFont('Roboto-Regular.ttf', 'Roboto', 'bold');
                 doc.setFont('Roboto');
             }
-        } catch(e) {
-            console.warn("Could not load Vietnamese font, using fallback", e);
-        }
+        } catch(e) { console.warn("Font error", e); }
 
         const sizeToCol = (size) => `s${size.toString().replace('.', '_')}`;
         
-        // Find the maximum size column that has data
+        // Xác định các cột size có dữ liệu
         let activeSizes = [];
         let maxIndexWithData = -1;
         sizes.forEach((s, idx) => {
@@ -37,12 +34,13 @@ export const exportStockReportPdf = async (group, sizes) => {
             if (hasData) maxIndexWithData = idx;
         });
         activeSizes = sizes.slice(0, maxIndexWithData + 1);
-        if (activeSizes.length === 0) activeSizes = [sizes[0]]; // fallback
+        if (activeSizes.length === 0) activeSizes = [sizes[0]];
 
-        // Get dynamic client name
         const firstRow = group.rows[0] || {};
         const clientName = firstRow.client || firstRow.client_name || "-";
+        const totalExported = group.rows.reduce((sum, r) => sum + (Number(r.shipped_quantity) || 0), 0);
 
+        // --- 2. Header & Top Summary (Giữ nguyên) ---
         doc.setFont('Roboto', 'bold');
         doc.setFontSize(16);
         doc.text("BIỂU GIAO THÀNH PHẨM", 40, 40);
@@ -51,36 +49,35 @@ export const exportStockReportPdf = async (group, sizes) => {
         doc.setFontSize(10);
         doc.text("ĐƠN VỊ CHUYỂN: DD (Long An)", 40, 60);
         doc.text(`ĐƠN VỊ LÃNH: ${clientName.toUpperCase()}`, 600, 60);
-
-        const totalExported = group.rows.reduce((sum, r) => sum + (Number(r.shipped_quantity) || 0), 0);
         doc.text(`Ngày: ${group.date}`, 40, 85);
-        doc.text(`Tổng giao: ${totalExported}`, 40, 105);
-        doc.text("Kỳ: T1", 280, 85).fill("red");
+        doc.text("Kỳ: T1", 280, 85);
 
+        // Nổi bật Tổng giao phía trên [Màu xanh nhạt]
+        doc.setFillColor(230, 240, 255); 
+        doc.rect(38, 93, 150, 18, 'F');
         doc.setTextColor(0, 51, 204); 
         doc.setFont('Roboto', 'bold');
-        // doc.text("HÀNG LỆNH", 40, 125);
+        doc.text(`Tổng giao: ${totalExported}`, 45, 105);
         doc.setTextColor(0, 0, 0);
 
-        const head = [
-            [
-                "STT", "ĐƠN HÀNG", "ART", "MODEL NAME", "SL\nGIAO", 
-                "CÒN LẠI", "ĐƠN\nVỊ", 
-                ...activeSizes, "GHI\nCHÚ"
-            ]
-        ];
+        // --- 3. Cấu trúc Table Data (Đã chuyển cột ART) ---
+        // VỊ TRÍ 1: Thay đổi tiêu đề bảng
+        const head = [[
+            "STT", "ĐƠN HÀNG", "MODEL NAME", "SL\nGIAO", 
+            "CÒN LẠI", "ĐƠN\nVỊ", "ART", ...activeSizes, "GHI\nCHÚ"
+        ]];
 
+        // VỊ TRÍ 2: Thay đổi dữ liệu trong từng dòng
         const body = group.rows.map((row, i) => {
             const isOk = (Number(row.remaining_quantity) || 0) <= 0;
             return [
                 i + 1,
-                // row.client || row.client_name || "",
                 row.ry_number || "",
-                row.model_name || "",
+                row.model_name || "", // Chuyển model_name lên trước ART
                 row.shipped_quantity || 0,
                 isOk ? "OK" : row.remaining_quantity,
                 "ĐÔI",
-                row.article || "",
+                row.article || "", // Chuyển article ra sau ĐƠN VỊ
                 ...activeSizes.map(s => {
                     const val = row[sizeToCol(s)];
                     return (val && val !== 0) ? val : "-";
@@ -89,45 +86,64 @@ export const exportStockReportPdf = async (group, sizes) => {
             ];
         });
 
+        // Tính toán dòng Tổng Cộng (Footer) (Điều chỉnh thứ tự cột)
+        const footerTotals = [
+            "TỔNG", "", "", 
+            totalExported, // Tổng SL Giao
+            "", "", "", // Còn lại, Đơn vị, ART bỏ trống
+            ...activeSizes.map(s => {
+                const totalSize = group.rows.reduce((sum, row) => sum + (Number(row[sizeToCol(s)]) || 0), 0);
+                return totalSize || "-";
+            }),
+            "" // Ghi chú
+        ];
+
+        // --- 4. Render Table (Điều chỉnh chiều rộng cột ART) ---
         autoTable(doc, {
-            startY: 135,
+            startY: 125,
             head: head,
             body: body,
+            foot: [footerTotals], 
             theme: 'grid',
             styles: {
                 font: 'Roboto',
-                fontStyle: 'normal',
                 fontSize: 7,
-                cellPadding: 2,
-                overflow: 'linebreak', // Allow wrapping
+                cellPadding: 3,
                 valign: 'middle',
                 halign: 'center',
-                lineWidth: 0.2,
                 lineColor: [80, 80, 80]
             },
             headStyles: {
-                font: 'Roboto',
-                fontStyle: 'bold',
-                fillColor: [255, 255, 255],
+                fillColor: [240, 240, 240],
                 textColor: [0, 0, 0],
-                lineWidth: 0.5,
-                lineColor: [0, 0, 0]
+                fontStyle: 'bold',
+                lineWidth: 0.5
             },
+            footStyles: {
+                fillColor: [230, 230, 230],
+                textColor: [0, 0, 0],
+                fontStyle: 'bold',
+                fontSize: 8
+            },
+            // VỊ TRÍ 3: Thay đổi chỉ số cột trong columnStyles
             columnStyles: {
-                0: { cellWidth: 22 }, // STT
-                // 1: { cellWidth: 55, halign: 'left' }, // KHÁCH HÀNG
-                1: { cellWidth: 65, fontStyle: 'bold' }, // ĐƠN HÀNG
-                3: { cellWidth: 'auto', halign: 'center' }, // MODEL NAME
-                4: { cellWidth: 30 }, // SL GIAO
-                5: { cellWidth: 30 }, // CÒN LẠI
-                6: { cellWidth: 30 }, // ĐƠN VỊ
-                2: { cellWidth: 45 }, // ART
-                [8 + activeSizes.length]: { cellWidth: 40, halign: 'left' } // GHI CHÚ
+                0: { cellWidth: 25 }, // STT
+                1: { cellWidth: 70, fontStyle: 'bold' }, // ĐƠN HÀNG
+                2: { cellWidth: 80, halign: 'left' }, // MODEL NAME 
+                3: { cellWidth: 35, fontStyle: 'bold' }, // SL GIAO
+                4: { cellWidth: 35 }, // CÒN LẠI
+                5: { cellWidth: 30 }, // ĐÔI
+                6: { cellWidth: 50 }, // ART (Cột mới chuyển về đây)
+                [8 + activeSizes.length]: { cellWidth: 50, halign: 'left' } // GHI CHÚ
             },
-            margin: { top: 30, right: 20, bottom: 30, left: 20 }
+            didParseCell: function (data) {
+                if (data.column.index === 4 && data.cell.text[0] === 'OK') {
+                    data.cell.styles.textColor = [0, 128, 0];
+                    data.cell.styles.fontStyle = 'bold';
+                }
+            },
+            margin: { left: 20, right: 20 }
         });
-
-        doc.text(`Tổng giao: ${totalExported}`, 40, 105);
 
         doc.save(`Bieu_Giao_${clientName.replace(/\s+/g, '_')}_${group.date.replace(/\//g, '-')}.pdf`);
     } catch (error) {
