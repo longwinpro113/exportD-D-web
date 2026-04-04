@@ -67,8 +67,8 @@ export const exportStockReportPdf = async (group, sizes) => {
         // --- 3. Cấu trúc Table Data (Đã chuyển cột ART) ---
         // VỊ TRÍ 1: Thay đổi tiêu đề bảng
         const head = [[
-            "STT", "ĐƠN HÀNG", "MODEL NAME", "SL\nGIAO", 
-            "CÒN LẠI", "ĐƠN\nVỊ", "ART", ...activeSizes, "GHI\nCHÚ"
+            "STT", "ĐƠN HÀNG", "MODEL NAME", "SL GIAO", 
+            "CÒN LẠI", "ĐƠN VỊ", "ART", ...activeSizes, "GHI CHÚ"
         ]];
 
         // VỊ TRÍ 2: Thay đổi dữ liệu trong từng dòng
