@@ -127,7 +127,7 @@ export const exportStockReportPdf = async (group, sizes) => {
             margin: { top: 30, right: 20, bottom: 30, left: 20 }
         });
 
-        doc
+        doc.text(`Tổng giao: ${totalExported}`, 40, 105);
 
         doc.save(`Bieu_Giao_${clientName.replace(/\s+/g, '_')}_${group.date.replace(/\//g, '-')}.pdf`);
     } catch (error) {
