@@ -52,12 +52,22 @@ export const exportStockReportPdf = async (group, sizes) => {
         doc.text(`Ngày: ${group.date}`, 40, 85);
         doc.text("Kỳ: T1", 280, 85);
 
-        // Nổi bật Tổng giao phía trên [Màu xanh nhạt]
-        doc.setFillColor(230, 240, 255); 
-        doc.rect(38, 93, 150, 18, 'F');
-        doc.setTextColor(0, 51, 204); 
+        // Nổi bật Tổng giao phía trên [Màu đỏ]
         doc.setFont('Roboto', 'bold');
-        doc.text(`Tổng giao: ${totalExported}`, 45, 105);
+        doc.setTextColor(0, 0, 0); 
+        doc.text("Tổng giao: ", 40, 105);
+
+        const labelWidth = doc.getTextWidth("Tổng giao: ");
+        const valueX = 40 + labelWidth + 5; 
+        const valueText = String(totalExported);
+        const rectWidth = doc.getTextWidth(valueText) + 10;
+
+        doc.setFillColor(255, 0, 0); 
+        doc.rect(valueX - 2, 93, rectWidth, 18, 'F');
+
+        doc.setTextColor(255, 255, 255); 
+        doc.text(valueText, valueX + 3, 105);
+        
         doc.setTextColor(0, 0, 0);
 
         // --- 3. Cấu trúc Table Data (Đã chuyển cột ART) ---
@@ -88,7 +98,7 @@ export const exportStockReportPdf = async (group, sizes) => {
 
         // Tính toán dòng Tổng Cộng (Footer) (Điều chỉnh thứ tự cột)
         const footerTotals = [
-            "TỔNG", "", "", 
+            "", "", "Tổng", 
             totalExported, // Tổng SL Giao
             "", "", "", // Còn lại, Đơn vị, ART bỏ trống
             ...activeSizes.map(s => {
@@ -120,12 +130,13 @@ export const exportStockReportPdf = async (group, sizes) => {
                 lineWidth: 0.5
             },
             footStyles: {
-                fillColor: [230, 230, 230],
-                textColor: [0, 0, 0],
-                fontStyle: 'bold',
-                fontSize: 8
+                fillColor: [255, 255, 255], 
+                textColor: [0, 0, 0],       
+                fontStyle: 'bold',          
+                fontSize: 8,
+                lineWidth: 0.5,
+                lineColor: [0, 0, 0]        
             },
-            // VỊ TRÍ 3: Thay đổi chỉ số cột trong columnStyles
             columnStyles: {
                 0: { cellWidth: 25 }, // STT
                 1: { cellWidth: 70, fontStyle: 'bold' }, // ĐƠN HÀNG
@@ -133,7 +144,7 @@ export const exportStockReportPdf = async (group, sizes) => {
                 3: { cellWidth: 35, fontStyle: 'bold' }, // SL GIAO
                 4: { cellWidth: 35 }, // CÒN LẠI
                 5: { cellWidth: 30 }, // ĐÔI
-                6: { cellWidth: 50 }, // ART (Cột mới chuyển về đây)
+                6: { cellWidth: 50 }, // ART 
                 [8 + activeSizes.length]: { cellWidth: 50, halign: 'left' } // GHI CHÚ
             },
             didParseCell: function (data) {
