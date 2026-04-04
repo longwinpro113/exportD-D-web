@@ -105,13 +105,13 @@ const OrderEntryForm = () => {
 
                 <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} md={3}>
-                        <TextField fullWidth label="Mã Đơn Hàng (RY)" required value={formData.ry_number}
+                        <TextField fullWidth label="Đơn Hàng" required value={formData.ry_number}
                             onChange={(e) => setFormData(prev => ({ ...prev, ry_number: e.target.value }))}
                             sx={inputSx}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
-                        <TextField fullWidth label="Tên Khách Hàng" required value={formData.client}
+                        <TextField fullWidth label="Khách Hàng" required value={formData.client}
                             onChange={(e) => setFormData(prev => ({ ...prev, client: e.target.value }))}
                             sx={inputSx}
                         />

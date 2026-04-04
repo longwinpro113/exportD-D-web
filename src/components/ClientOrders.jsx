@@ -16,8 +16,10 @@ const buildSizes = () => {
 const sizes = buildSizes();
 
 const ClientOrders = () => {
-    const [query, updateQuery] = useQuery({ q: '' });
+    const [query, updateQuery] = useQuery({ q: '', client: '' });
     const [rawOrders, loading] = useFetchList('/api/orders', {});
+    const [clients] = useFetchList('/api/orders/clients', {});
+    const [selectedClient, setSelectedClient] = useState(null);
 
     const [tableData, setTableData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -38,6 +40,7 @@ const ClientOrders = () => {
             return {
                 id: item.ry_number,
                 donHang: item.ry_number || '',
+                client: item.client || '',
                 article: item.article || '',
                 modelName: item.model_name || '',
                 total: item.total_order_qty || 0,
@@ -48,17 +51,25 @@ const ClientOrders = () => {
 
         setTableData(mappedData);
         setFilteredData(mappedData);
-    }, [rawOrders, sizes]);
+    }, [rawOrders]);
 
     useEffect(() => {
-        if (!query.q.trim()) {
-            setFilteredData(tableData);
-        } else {
-            setFilteredData(tableData.filter(item =>
-                item.donHang.toLowerCase().includes(query.q.toLowerCase())
-            ));
+        let result = tableData;
+        if (query.client) {
+            result = result.filter(item => item.client === query.client);
         }
-    }, [query.q, tableData]);
+        if (query.q.trim()) {
+            result = result.filter(item =>
+                item.donHang.toLowerCase().includes(query.q.toLowerCase())
+            );
+        }
+        setFilteredData(result);
+    }, [query.q, query.client, tableData]);
+
+    const handleClientChange = (newClient) => {
+        setSelectedClient(newClient);
+        updateQuery({ client: newClient ? newClient.client : '' });
+    };
 
     const cellStyle = { color: '#1e293b', fontSize: '0.85rem', height: 38, borderRight: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' };
 
@@ -76,8 +87,12 @@ const ClientOrders = () => {
                 <ReportHeader 
                     title="THEO DÕI ĐƠN HÀNG"
                     sender="Danh sách chi tiết các đơn hàng và số liệu từng size"
+                    receiver={selectedClient ? selectedClient.client : '-'}
                     placeholder="Nhập mã đơn hàng ..."
                     onSearch={(text) => updateQuery({ q: text })}
+                    clients={clients}
+                    selectedClient={selectedClient}
+                    onClientChange={handleClientChange}
                 />
 
                 <Box sx={{ flexGrow: 1, borderTop: '1px solid #e2e8f0', width: '100%', overflow: 'auto', bgcolor: '#f8fafc' }}>
@@ -91,8 +106,13 @@ const ClientOrders = () => {
                                     {['STT', 'Đơn Hàng', 'Article', 'Model Name', 'Total', 'Đợt giao hàng'].map((h, i) => (
                                         <TableCell key={h} align="center" sx={{
                                             color: '#475569', fontWeight: 600, fontSize: '0.85rem',
-                                            minWidth: i === 0 ? 50 : i === 3 ? 140 : i === 2 ? 80 : 120,
-                                            backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0'
+                                            minWidth: i === 0 ? 50 : i === 1 ? 120 : i === 3 ? 140 : i === 2 ? 80 : 120,
+                                            backgroundColor: '#f8fafc', 
+                                            borderBottom: '1px solid #e2e8f0', 
+                                            borderRight: '1px solid #e2e8f0',
+                                            position: i <= 1 ? 'sticky' : 'static',
+                                            left: i === 0 ? 0 : i === 1 ? 50 : 'auto',
+                                            zIndex: i <= 1 ? 12 : 'auto'
                                         }}>{h}</TableCell>
                                     ))}
                                     {sizes.map(s => (
@@ -106,10 +126,22 @@ const ClientOrders = () => {
                             <TableBody>
                                 {filteredData.map((row, index) => (
                                     <TableRow key={row.id}>
-                                        <TableCell align="center" sx={{ ...cellStyle, fontWeight: 500, color: '#64748b' }}>
+                                        <TableCell align="center" sx={{ 
+                                            ...cellStyle, 
+                                            position: 'sticky', left: 0, 
+                                            bgcolor: 'white', zIndex: 5,
+                                            width: 50,
+                                            fontWeight: 500, color: '#64748b' 
+                                        }}>
                                             {index + 1}
                                         </TableCell>
-                                        <TableCell align="center" sx={{ ...cellStyle, fontWeight: 600 }}>{row.donHang}</TableCell>
+                                        <TableCell align="center" sx={{ 
+                                            ...cellStyle, 
+                                            position: 'sticky', left: 50, 
+                                            bgcolor: 'white', zIndex: 5,
+                                            width: 120,
+                                            fontWeight: 600 
+                                        }}>{row.donHang}</TableCell>
                                         <TableCell align="center" sx={cellStyle}>{row.article}</TableCell>
                                         <TableCell align="center" sx={{ ...cellStyle, fontWeight: 600 }}>{row.modelName}</TableCell>
                                         <TableCell align="center" sx={{ ...cellStyle, fontWeight: 700 }}>{row.total}</TableCell>
