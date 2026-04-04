@@ -55,11 +55,11 @@ export const exportStockReportPdf = async (group, sizes) => {
         const totalExported = group.rows.reduce((sum, r) => sum + (Number(r.shipped_quantity) || 0), 0);
         doc.text(`Ngày: ${group.date}`, 40, 85);
         doc.text(`Tổng giao: ${totalExported}`, 40, 105);
-        doc.text("Ký: T1", 280, 85);
+        doc.text("Kỳ: T1", 280, 85).fill("red");
 
         doc.setTextColor(0, 51, 204); 
         doc.setFont('Roboto', 'bold');
-        doc.text("HÀNG LỆNH", 40, 125);
+        // doc.text("HÀNG LỆNH", 40, 125);
         doc.setTextColor(0, 0, 0);
 
         const head = [
@@ -76,11 +76,11 @@ export const exportStockReportPdf = async (group, sizes) => {
                 i + 1,
                 // row.client || row.client_name || "",
                 row.ry_number || "",
-                row.article || "",
                 row.model_name || "",
                 row.shipped_quantity || 0,
                 isOk ? "OK" : row.remaining_quantity,
                 "ĐÔI",
+                row.article || "",
                 ...activeSizes.map(s => {
                     const val = row[sizeToCol(s)];
                     return (val && val !== 0) ? val : "-";
@@ -117,15 +117,17 @@ export const exportStockReportPdf = async (group, sizes) => {
                 0: { cellWidth: 22 }, // STT
                 // 1: { cellWidth: 55, halign: 'left' }, // KHÁCH HÀNG
                 1: { cellWidth: 65, fontStyle: 'bold' }, // ĐƠN HÀNG
-                2: { cellWidth: 45 }, // ART
                 3: { cellWidth: 'auto', halign: 'center' }, // MODEL NAME
                 4: { cellWidth: 30 }, // SL GIAO
                 5: { cellWidth: 30 }, // CÒN LẠI
                 6: { cellWidth: 30 }, // ĐƠN VỊ
+                2: { cellWidth: 45 }, // ART
                 [8 + activeSizes.length]: { cellWidth: 40, halign: 'left' } // GHI CHÚ
             },
             margin: { top: 30, right: 20, bottom: 30, left: 20 }
         });
+
+        doc
 
         doc.save(`Bieu_Giao_${clientName.replace(/\s+/g, '_')}_${group.date.replace(/\//g, '-')}.pdf`);
     } catch (error) {
