@@ -65,16 +65,7 @@ const OrderEntryForm = () => {
                 ...sizePayload
             };
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/orders`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.error || 'Failed to save order');
-            }
+            await createOrder(payload);
 
             setSnackbar({ open: true, message: 'Lưu đơn hàng thành công.', severity: 'success' });
             handleReset();

@@ -32,13 +32,16 @@ export const fetchStockReport = async (searchParams) => {
     return res.json();
 };
 
-export const saveOrder = async (payload) => {
+export const createOrder = async (payload) => {
     const res = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error('Save failed');
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Save failed');
+    }
     return res.json();
 };
 
