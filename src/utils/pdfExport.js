@@ -141,7 +141,7 @@ export const exportStockReportPdf = async (group, sizes) => {
             columnStyles: {
                 0: { cellWidth: 25 }, // STT
                 1: { cellWidth: 70, fontStyle: 'bold' }, // ĐƠN HÀNG
-                2: { cellWidth: 50, halign: 'center' }, // MODEL NAME 
+                2: { cellWidth: 60, halign: 'center' }, // MODEL NAME 
                 3: { cellWidth: 35, fontStyle: 'bold' }, // SL GIAO
                 4: { cellWidth: 35 }, // CÒN LẠI
                 5: { cellWidth: 30 }, // ĐÔI
@@ -155,7 +155,7 @@ export const exportStockReportPdf = async (group, sizes) => {
                     data.cell.styles.fontStyle = 'bold';
                 }
             },
-            margin: { left: 15, right: 20 },
+            margin: { left: 15, right: 25 },
             tableWidth: 'auto'
         });
 
