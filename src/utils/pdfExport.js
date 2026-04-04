@@ -43,14 +43,14 @@ export const exportStockReportPdf = async (group, sizes) => {
         // --- 2. Header & Top Summary (Giữ nguyên) ---
         doc.setFont('Roboto', 'bold');
         doc.setFontSize(16);
-        doc.text("BIỂU GIAO THÀNH PHẨM", 40, 40);
+        doc.text("BIỂU GIAO THÀNH PHẨM", 35, 40);
         
         doc.setFont('Roboto', 'normal');
         doc.setFontSize(10);
-        doc.text("ĐƠN VỊ CHUYỂN: DD (Long An)", 40, 60);
+        doc.text("ĐƠN VỊ CHUYỂN: DD (Long An)", 35, 60);
         doc.text(`ĐƠN VỊ LÃNH: ${clientName.toUpperCase()}`, 600, 60);
-        doc.text(`Ngày: ${group.date}`, 40, 85);
-        doc.text("Kỳ: T1", 280, 85);
+        doc.text(`Ngày: ${group.date}`, 35, 85);
+        doc.text("Kỳ: T1", 250, 85);
 
         // Nổi bật Tổng giao phía trên [Màu đỏ]
         const totalLabel = `Tổng giao: ${totalExported}`;
@@ -155,7 +155,7 @@ export const exportStockReportPdf = async (group, sizes) => {
                     data.cell.styles.fontStyle = 'bold';
                 }
             },
-            margin: { left: 20, right: 20 },
+            margin: { left: 15, right: 20 },
             tableWidth: 'auto'
         });
 
