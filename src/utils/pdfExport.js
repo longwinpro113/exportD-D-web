@@ -132,17 +132,16 @@ export const exportStockReportPdf = async (group, sizes) => {
                 lineWidth: 0.5
             },
             footStyles: {
-                fillColor: [255, 255, 255], 
-                textColor: [0, 0, 0],       
-                fontStyle: 'bold',          
+                fillColor: [255, 255, 255],
+                textColor: [0, 0, 0],
+                fontStyle: 'bold',
                 fontSize: 8,
-                lineWidth: 0.5,
-                lineColor: [0, 0, 0]        
+                lineWidth: 0        
             },
             columnStyles: {
                 0: { cellWidth: 25 }, // STT
                 1: { cellWidth: 70, fontStyle: 'bold' }, // ĐƠN HÀNG
-                2: { cellWidth: 80, halign: 'left' }, // MODEL NAME 
+                2: { cellWidth: 50, halign: 'center' }, // MODEL NAME 
                 3: { cellWidth: 35, fontStyle: 'bold' }, // SL GIAO
                 4: { cellWidth: 35 }, // CÒN LẠI
                 5: { cellWidth: 30 }, // ĐÔI
@@ -156,7 +155,8 @@ export const exportStockReportPdf = async (group, sizes) => {
                     data.cell.styles.fontStyle = 'bold';
                 }
             },
-            margin: { left: 20, right: 20 }
+            margin: { left: 20, right: 20 },
+            tableWidth: 'auto'
         });
 
         doc.save(`Bieu_Giao_${clientName.replace(/\s+/g, '_')}_${group.date.replace(/\//g, '-')}.pdf`);
