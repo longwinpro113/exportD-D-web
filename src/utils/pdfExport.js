@@ -64,7 +64,7 @@ export const exportStockReportPdf = async (group, sizes) => {
 
         const head = [
             [
-                "STT", "KHÁCH HÀNG", "ĐƠN HÀNG", "ART", "MODEL NAME", "SL\nGIAO", 
+                "STT", "ĐƠN HÀNG", "ART", "MODEL NAME", "SL\nGIAO", 
                 "CÒN LẠI", "ĐƠN\nVỊ", 
                 ...activeSizes, "GHI\nCHÚ"
             ]
@@ -74,7 +74,7 @@ export const exportStockReportPdf = async (group, sizes) => {
             const isOk = (Number(row.remaining_quantity) || 0) <= 0;
             return [
                 i + 1,
-                row.client || row.client_name || "",
+                // row.client || row.client_name || "",
                 row.ry_number || "",
                 row.article || "",
                 row.model_name || "",
@@ -115,13 +115,13 @@ export const exportStockReportPdf = async (group, sizes) => {
             },
             columnStyles: {
                 0: { cellWidth: 22 }, // STT
-                1: { cellWidth: 55, halign: 'left' }, // KHÁCH HÀNG
-                2: { cellWidth: 65, fontStyle: 'bold' }, // ĐƠN HÀNG
-                3: { cellWidth: 45 }, // ART
-                4: { cellWidth: 'auto', halign: 'left' }, // MODEL NAME
-                5: { cellWidth: 30 }, // SL GIAO
-                6: { cellWidth: 30 }, // CÒN LẠI
-                7: { cellWidth: 30 }, // ĐƠN VỊ
+                // 1: { cellWidth: 55, halign: 'left' }, // KHÁCH HÀNG
+                1: { cellWidth: 65, fontStyle: 'bold' }, // ĐƠN HÀNG
+                2: { cellWidth: 45 }, // ART
+                3: { cellWidth: 'auto', halign: 'left' }, // MODEL NAME
+                4: { cellWidth: 30 }, // SL GIAO
+                5: { cellWidth: 30 }, // CÒN LẠI
+                6: { cellWidth: 30 }, // ĐƠN VỊ
                 [8 + activeSizes.length]: { cellWidth: 40, halign: 'left' } // GHI CHÚ
             },
             margin: { top: 30, right: 20, bottom: 30, left: 20 }
