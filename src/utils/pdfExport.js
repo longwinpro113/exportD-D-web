@@ -40,11 +40,12 @@ export const exportStockReportPdf = async (group, sizes) => {
         if (activeSizes.length === 0) activeSizes = [sizes[0]]; // fallback
 
         // Get dynamic client name
-        const clientName = group.rows[0]?.client_name || group.rows[0]?.client || "CÔNG TY LẠC TỶ";
+        const firstRow = group.rows[0] || {};
+        const clientName = firstRow.client || firstRow.client_name || "-";
 
         doc.setFont('Roboto', 'bold');
         doc.setFontSize(16);
-        doc.text(`BIỂU GIAO THÀNH PHẨM QUA ${clientName.toUpperCase()}`, 40, 40);
+        doc.text("BIỂU GIAO THÀNH PHẨM", 40, 40);
         
         doc.setFont('Roboto', 'normal');
         doc.setFontSize(10);
@@ -73,7 +74,7 @@ export const exportStockReportPdf = async (group, sizes) => {
             const isOk = (Number(row.remaining_quantity) || 0) <= 0;
             return [
                 i + 1,
-                row.client_name || row.client || "",
+                row.client || row.client_name || "",
                 row.ry_number || "",
                 row.article || "",
                 row.model_name || "",

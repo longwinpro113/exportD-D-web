@@ -151,12 +151,20 @@ const DeleteDialog = ({ open, row, onClose, onConfirm }) => {
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 
 const StockReport = () => {
-  const [query, updateQuery] = useQuery({ q: '' });
+  const [query, updateQuery] = useQuery({ q: '', client: '' });
   const [editRow, setEditRow] = useState(null);
   const [deleteRow, setDeleteRow] = useState(null);
+  const [selectedClient, setSelectedClient] = useState(null);
 
   const [data, loading, , refetch] = useFetchList('/api/export', query);
+  const [clients] = useFetchList('/api/orders/clients', {});
+  
   const tableData = useMemo(() => Array.isArray(data) ? groupByDate(data) : [], [data]);
+
+  const handleClientChange = (newClient) => {
+    setSelectedClient(newClient);
+    updateQuery({ client: newClient ? newClient.client : '' });
+  };
 
   const memoizedTable = useMemo(() => {
     if (loading && tableData.length === 0) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}><CircularProgress /></Box>;
@@ -223,7 +231,7 @@ const StockReport = () => {
                   return (
                     <TableRow key={row.id} hover>
                       <TableCell sx={{ ...cellStyle, position: 'sticky', left: 0, bgcolor: 'white', zIndex: 5, width: '40px', fontWeight: 800 }}>{rIdx + 1}</TableCell>
-                      <TableCell sx={{ ...cellStyle, position: 'sticky', left: '40px', bgcolor: 'white', zIndex: 5, fontWeight: 500, width: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.client_name || '-'}</TableCell>
+                      <TableCell sx={{ ...cellStyle, position: 'sticky', left: '40px', bgcolor: 'white', zIndex: 5, fontWeight: 500, width: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.client || '-'}</TableCell>
                       <TableCell sx={{ ...cellStyle, position: 'sticky', left: '140px', bgcolor: 'white', zIndex: 5, fontWeight: 800, borderRight: '2px solid #e2e8f0', width: '120px' }}>{row.ry_number}</TableCell>
                       <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D' }}>{row.delivery_round}</TableCell>
                       <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article}</TableCell>
@@ -272,10 +280,14 @@ const StockReport = () => {
       <Paper elevation={0} sx={{ border: '1px solid #e2e8f0', borderRadius: '12px', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', bgcolor: '#fff' }}>
 
         <ReportHeader
-          title="BIỂU GIAO THÀNH PHẨM QUA CÔNG TY LẠC TỶ"
+          title="BIỂU GIAO THÀNH PHẨM"
+          receiver={selectedClient ? selectedClient.client : '-'}
           placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
           onSearch={(t) => updateQuery({ q: t })}
           loading={loading}
+          clients={clients}
+          selectedClient={selectedClient}
+          onClientChange={handleClientChange}
         />
 
         <Box sx={{ flex: 1, borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

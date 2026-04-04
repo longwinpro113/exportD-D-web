@@ -6,6 +6,12 @@ export const fetchOrders = async () => {
     return res.json();
 };
 
+export const fetchClients = async () => {
+    const res = await fetch(`${API_URL}/api/orders/clients`);
+    if (!res.ok) throw new Error('Thất bại khi lấy danh sách khách hàng!');
+    return res.json();
+};
+
 export const fetchOrderExports = async (ryNumber) => {
     const res = await fetch(`${API_URL}/api/export?ry_number=${encodeURIComponent(ryNumber)}`);
     if (!res.ok) throw new Error('Kết nối thất bại!');

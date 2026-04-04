@@ -19,7 +19,7 @@ const sizes = buildSizes();
 const OrderEntryForm = () => {
     const [formData, setFormData] = useState({
         ry_number: '',
-        client_name: '',
+        client: '',
         article: '',
         model_name: '',
         delivery_round: '',
@@ -32,7 +32,7 @@ const OrderEntryForm = () => {
     const handleReset = () => {
         setFormData({
             ry_number: '',
-            client_name: '',
+            client: '',
             article: '',
             model_name: '',
             delivery_round: '',
@@ -41,7 +41,7 @@ const OrderEntryForm = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.ry_number || !formData.client_name || !formData.article) {
+        if (!formData.ry_number || !formData.client || !formData.article) {
             setSnackbar({ open: true, message: 'Vui lòng nhập Đơn hàng, Khách hàng và Article.', severity: 'warning' });
             return;
         }
@@ -57,7 +57,7 @@ const OrderEntryForm = () => {
 
             const payload = {
                 ry_number: formData.ry_number,
-                client_name: formData.client_name,
+                client: formData.client,
                 article: formData.article,
                 model_name: formData.model_name,
                 delivery_round: formData.delivery_round,
@@ -111,8 +111,8 @@ const OrderEntryForm = () => {
                         />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
-                        <TextField fullWidth label="Tên Khách Hàng" required value={formData.client_name}
-                            onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
+                        <TextField fullWidth label="Tên Khách Hàng" required value={formData.client}
+                            onChange={(e) => setFormData(prev => ({ ...prev, client: e.target.value }))}
                             sx={inputSx}
                         />
                     </Grid>

@@ -26,6 +26,7 @@ const sizes = buildSizes();
 const EntryForm = () => {
     const [formData, setFormData] = useState({
         ngayGiao: null,
+        khachHang: null,
         donHang: '',
         article: '',
         modelName: '',
@@ -34,9 +35,21 @@ const EntryForm = () => {
         sizeValues: {}
     });
 
-    const [orderOptions, loadingOrders] = useFetchList('/api/orders', {});
+    const [clients] = useFetchList('/api/orders/clients', {});
+    const [orderOptions, loadingOrders] = useFetchList('/api/orders', { client: formData.khachHang ? formData.khachHang.client : '' });
     const [saving, setSaving] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+    const handleClientChange = (event, newValue) => {
+        setFormData(prev => ({ 
+            ...prev, 
+            khachHang: newValue,
+            donHang: '', 
+            article: '', 
+            modelName: '', 
+            totalQuantity: '' 
+        }));
+    };
 
     const handleOrderChange = (event, newValue) => {
         if (newValue && typeof newValue === 'object') {
@@ -53,7 +66,7 @@ const EntryForm = () => {
     };
 
     const handleReset = () => {
-        setFormData({ ngayGiao: null, donHang: '', article: '', modelName: '', totalQuantity: '', ghiChu: '', sizeValues: {} });
+        setFormData({ ngayGiao: null, khachHang: null, donHang: '', article: '', modelName: '', totalQuantity: '', ghiChu: '', sizeValues: {} });
     };
 
     const handleSave = async () => {
@@ -130,10 +143,14 @@ const EntryForm = () => {
                 width: '100%',
                 minHeight: 'fit-content'
             }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e293b', mb: 1, textTransform: 'uppercase' }}>
+                    Nhập thông tin phiếu xuất kho
+                </Typography>
+
                 {/* Header Row: Date & Order Info */}
                 <Box sx={{
                     display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(5, 1fr)' },
+                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(6, 1fr)' },
                     gap: { xs: 2, md: 2 },
                     width: '100%',
                     mb: 1
@@ -157,6 +174,26 @@ const EntryForm = () => {
                             }}
                         />
                     </LocalizationProvider>
+
+                    <Autocomplete
+                        disablePortal
+                        options={clients}
+                        getOptionLabel={(option) => option.client || ''}
+                        value={formData.khachHang}
+                        onChange={handleClientChange}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Khách hàng" required />
+                        )}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: '8px',
+                                bgcolor: '#ffffff',
+                                fontWeight: 600,
+                                '& fieldset': { borderColor: '#000000' },
+                                '&.Mui-focused fieldset': { borderColor: '#000000', borderWidth: '2px' },
+                            }
+                        }}
+                    />
 
                     <Autocomplete
                         disablePortal
