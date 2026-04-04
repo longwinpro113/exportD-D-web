@@ -177,17 +177,17 @@ const StockReport = () => {
         }}>
           <TableHead>
             <TableRow>
-              {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+              {['STT', 'Khách hàng', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Ngày', 'SL Còn Lại', 'Trạng Thái', 'Ghi chú'].map((h, i) => (
                 <TableCell key={h} sx={{
-                  bgcolor: i >= 5 && i <= 8 ? '#f1f7ff' : '#f8fafc',
+                  bgcolor: i >= 6 && i <= 9 ? '#f1f7ff' : '#f8fafc',
                   fontWeight: 800, fontSize: '0.82rem',
                   position: 'sticky', top: 0,
-                  left: i === 0 ? 0 : i === 1 ? '40px' : 'auto',
-                  width: i === 0 ? '40px' : i === 1 ? '120px' : i === 2 ? '60px' : i === 3 ? '80px' : i === 4 ? '130px' : '75px',
-                  minWidth: i === 0 ? '40px' : i === 1 ? '120px' : i === 2 ? '60px' : i === 3 ? '80px' : i === 4 ? '130px' : '75px',
-                  zIndex: i <= 1 ? 12 : 2,
-                  borderRight: i === 1 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
-                  boxShadow: i === 1 ? '2px 0 5px -2px rgba(0,0,0,0.1)' : 'none'
+                  left: i === 0 ? 0 : i === 1 ? '40px' : i === 2 ? '140px' : 'auto',
+                  width: i === 0 ? '40px' : i === 1 ? '100px' : i === 2 ? '120px' : i === 3 ? '60px' : i === 4 ? '80px' : i === 5 ? '130px' : '75px',
+                  minWidth: i === 0 ? '40px' : i === 1 ? '100px' : i === 2 ? '120px' : i === 3 ? '60px' : i === 4 ? '80px' : i === 5 ? '130px' : '75px',
+                  zIndex: i <= 2 ? 12 : 2,
+                  borderRight: i === 2 ? '2px solid #e2e8f0' : '1px solid #f1f5f9',
+                  boxShadow: i === 2 ? '2px 0 5px -2px rgba(0,0,0,0.1)' : 'none'
                 }}>{h}</TableCell>
               ))}
               {sizes.map(size => (
@@ -205,7 +205,7 @@ const StockReport = () => {
             {tableData.map((group, gIdx) => (
               <React.Fragment key={gIdx}>
                 <TableRow>
-                  <TableCell colSpan={sizes.length + 12} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderBottom: '1px solid #cbd5e1' }}>
+                  <TableCell colSpan={sizes.length + 14} sx={{ bgcolor: '#f0f7ff', textAlign: 'left !important', py: 0, height: 38, borderBottom: '1px solid #cbd5e1' }}>
                     <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, position: 'sticky', left: '40px', width: '120px', justifyContent: 'center' }}>
                       <CalendarTodayOutlinedIcon sx={{ fontSize: '0.85rem', color: '#1976d2' }} />
                       <Typography sx={{ fontWeight: 700, color: '#1976d2', fontSize: '0.8rem' }}>{group.date}</Typography>
@@ -223,7 +223,8 @@ const StockReport = () => {
                   return (
                     <TableRow key={row.id} hover>
                       <TableCell sx={{ ...cellStyle, position: 'sticky', left: 0, bgcolor: 'white', zIndex: 5, width: '40px', fontWeight: 800 }}>{rIdx + 1}</TableCell>
-                      <TableCell sx={{ ...cellStyle, position: 'sticky', left: '40px', bgcolor: 'white', zIndex: 5, fontWeight: 800, borderRight: '2px solid #e2e8f0', width: '120px' }}>{row.ry_number}</TableCell>
+                      <TableCell sx={{ ...cellStyle, position: 'sticky', left: '40px', bgcolor: 'white', zIndex: 5, fontWeight: 500, width: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.client_name || '-'}</TableCell>
+                      <TableCell sx={{ ...cellStyle, position: 'sticky', left: '140px', bgcolor: 'white', zIndex: 5, fontWeight: 800, borderRight: '2px solid #e2e8f0', width: '120px' }}>{row.ry_number}</TableCell>
                       <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D' }}>{row.delivery_round}</TableCell>
                       <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article}</TableCell>
                       <TableCell sx={{ ...cellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name}</TableCell>
@@ -232,6 +233,7 @@ const StockReport = () => {
                       <TableCell sx={{ ...cellStyle, color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity}</TableCell>
                       <TableCell sx={{ ...cellStyle, fontWeight: 600, color: row.remaining_quantity <= 0 ? '#16a34a' : '#ef4444' }}>{row.remaining_quantity}</TableCell>
                       <TableCell sx={{ ...cellStyle, bgcolor: status.bg, color: status.color, fontWeight: 800, fontSize: '0.75rem' }}>{status.label}</TableCell>
+                      <TableCell sx={{ ...cellStyle, color: '#475569', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.note || '-'}</TableCell>
                       {sizes.map(s => {
                         const val = row[sizeToCol(s)];
                         return (

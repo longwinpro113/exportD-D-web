@@ -30,6 +30,7 @@ const EntryForm = () => {
         article: '',
         modelName: '',
         totalQuantity: '',
+        ghiChu: '',
         sizeValues: {}
     });
 
@@ -52,7 +53,7 @@ const EntryForm = () => {
     };
 
     const handleReset = () => {
-        setFormData({ ngayGiao: null, donHang: '', article: '', modelName: '', totalQuantity: '', sizeValues: {} });
+        setFormData({ ngayGiao: null, donHang: '', article: '', modelName: '', totalQuantity: '', ghiChu: '', sizeValues: {} });
     };
 
     const handleSave = async () => {
@@ -76,6 +77,7 @@ const EntryForm = () => {
             const payload = {
                 export_date,
                 ry_number: formData.donHang,
+                note: formData.ghiChu || null,
                 ...sizePayload
             };
 
@@ -131,8 +133,8 @@ const EntryForm = () => {
                 {/* Header Row: Date & Order Info */}
                 <Box sx={{
                     display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(4, 1fr)' },
-                    gap: { xs: 2, md: 4 },
+                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(5, 1fr)' },
+                    gap: { xs: 2, md: 2 },
                     width: '100%',
                     mb: 1
                 }}>
@@ -196,6 +198,11 @@ const EntryForm = () => {
 
                     <TextField fullWidth label="Model Name" disabled value={formData.modelName}
                         sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px', bgcolor: '#f8fafc', fontWeight: 600, '-webkit-text-fill-color': '#0f172a' } }}
+                    />
+
+                    <TextField fullWidth label="Ghi Chú" value={formData.ghiChu}
+                        onChange={(e) => setFormData(prev => ({ ...prev, ghiChu: e.target.value }))}
+                        sx={inputSx}
                     />
                 </Box>
 

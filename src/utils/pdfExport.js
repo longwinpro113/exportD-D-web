@@ -27,14 +27,29 @@ export const exportStockReportPdf = async (group, sizes) => {
             console.warn("Could not load Vietnamese font, using fallback", e);
         }
 
+        const sizeToCol = (size) => `s${size.toString().replace('.', '_')}`;
+        
+        // Find the maximum size column that has data
+        let activeSizes = [];
+        let maxIndexWithData = -1;
+        sizes.forEach((s, idx) => {
+            const hasData = group.rows.some(row => (parseFloat(row[sizeToCol(s)]) || 0) > 0);
+            if (hasData) maxIndexWithData = idx;
+        });
+        activeSizes = sizes.slice(0, maxIndexWithData + 1);
+        if (activeSizes.length === 0) activeSizes = [sizes[0]]; // fallback
+
+        // Get dynamic client name
+        const clientName = group.rows[0]?.client_name || group.rows[0]?.client || "CÔNG TY LẠC TỶ";
+
         doc.setFont('Roboto', 'bold');
         doc.setFontSize(16);
-        doc.text("BIỂU GIAO THÀNH PHẨM QUA CÔNG TY LẠC TỶ", 40, 40);
+        doc.text(`BIỂU GIAO THÀNH PHẨM QUA ${clientName.toUpperCase()}`, 40, 40);
         
         doc.setFont('Roboto', 'normal');
         doc.setFontSize(10);
         doc.text("ĐƠN VỊ CHUYỂN: DD (Long An)", 40, 60);
-        doc.text("ĐƠN VỊ LÃNH: CÔNG TY LẠC TỶ", 600, 60);
+        doc.text(`ĐƠN VỊ LÃNH: ${clientName.toUpperCase()}`, 600, 60);
 
         const totalExported = group.rows.reduce((sum, r) => sum + (Number(r.shipped_quantity) || 0), 0);
         doc.text(`Ngày: ${group.date}`, 40, 85);
@@ -48,29 +63,28 @@ export const exportStockReportPdf = async (group, sizes) => {
 
         const head = [
             [
-                "STT", "ĐƠN HÀNG", "MODEL NAME", "SL GIAO", 
-                "CÒN LẠI", "ĐƠN VỊ", "ART", 
-                ...sizes, "GHI CHÚ"
+                "STT", "KHÁCH HÀNG", "ĐƠN HÀNG", "ART", "MODEL NAME", "SL\nGIAO", 
+                "CÒN LẠI", "ĐƠN\nVỊ", 
+                ...activeSizes, "GHI\nCHÚ"
             ]
         ];
-
-        const sizeToCol = (size) => `s${size.toString().replace('.', '_')}`;
 
         const body = group.rows.map((row, i) => {
             const isOk = (Number(row.remaining_quantity) || 0) <= 0;
             return [
                 i + 1,
+                row.client_name || row.client || "",
                 row.ry_number || "",
+                row.article || "",
                 row.model_name || "",
                 row.shipped_quantity || 0,
                 isOk ? "OK" : row.remaining_quantity,
                 "ĐÔI",
-                row.article || "",
-                ...sizes.map(s => {
+                ...activeSizes.map(s => {
                     const val = row[sizeToCol(s)];
                     return (val && val !== 0) ? val : "-";
                 }),
-                ""
+                row.note || ""
             ];
         });
 
@@ -83,8 +97,8 @@ export const exportStockReportPdf = async (group, sizes) => {
                 font: 'Roboto',
                 fontStyle: 'normal',
                 fontSize: 7,
-                cellPadding: 3,
-                overflow: 'hidden',
+                cellPadding: 2,
+                overflow: 'linebreak', // Allow wrapping
                 valign: 'middle',
                 halign: 'center',
                 lineWidth: 0.2,
@@ -99,18 +113,20 @@ export const exportStockReportPdf = async (group, sizes) => {
                 lineColor: [0, 0, 0]
             },
             columnStyles: {
-                0: { cellWidth: 25 }, // STT
-                1: { cellWidth: 70, fontStyle: 'bold' }, // ĐƠN HÀNG
-                2: { cellWidth: 'auto', halign: 'left' }, // MODEL NAME
-                3: { cellWidth: 35 }, // SL GIAO
-                4: { cellWidth: 35 }, // CÒN LẠI
-                5: { cellWidth: 35 }, // ĐƠN VỊ
-                6: { cellWidth: 45 }, // ART
+                0: { cellWidth: 22 }, // STT
+                1: { cellWidth: 55, halign: 'left' }, // KHÁCH HÀNG
+                2: { cellWidth: 65, fontStyle: 'bold' }, // ĐƠN HÀNG
+                3: { cellWidth: 45 }, // ART
+                4: { cellWidth: 'auto', halign: 'left' }, // MODEL NAME
+                5: { cellWidth: 30 }, // SL GIAO
+                6: { cellWidth: 30 }, // CÒN LẠI
+                7: { cellWidth: 30 }, // ĐƠN VỊ
+                [8 + activeSizes.length]: { cellWidth: 40, halign: 'left' } // GHI CHÚ
             },
             margin: { top: 30, right: 20, bottom: 30, left: 20 }
         });
 
-        doc.save(`Bieu_Giao_CTY_Lac_Ty_${group.date.replace(/\//g, '-')}.pdf`);
+        doc.save(`Bieu_Giao_${clientName.replace(/\s+/g, '_')}_${group.date.replace(/\//g, '-')}.pdf`);
     } catch (error) {
         console.error("PDF Export error:", error);
         alert("Lỗi xuất PDF: " + error.message);

@@ -8,11 +8,13 @@ import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 
 import ClientOrders from './components/ClientOrders';
 import EntryForm from './components/EntryForm';
+import OrderEntryForm from './components/OrderEntryForm';
 import StockReport from './components/StockReport';
 import RemainingStock from './components/RemainingStock';
 
@@ -29,6 +31,7 @@ function App() {
 
   const navItems = [
     { id: 'client-orders', path: '/client-orders', label: 'Quản Lý Đơn Hàng', Icon: ManageSearchOutlinedIcon },
+    { id: 'order-entry', path: '/order-entry', label: 'Nhập Đơn Hàng', Icon: AddCircleOutlineIcon },
     { id: 'entry-form', path: '/entry-form', label: 'Entry Form', Icon: PostAddOutlinedIcon },
     { id: 'phieu-xuat-kho', path: '/phieu-xuat-kho', label: 'Phiếu Xuất Kho', Icon: WarehouseOutlinedIcon },
     { id: 'hang-con-no', path: '/hang-con-no', label: 'Hàng Còn Nợ', Icon: InventoryIcon },
@@ -144,6 +147,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/client-orders" replace />} />
             <Route path="/client-orders" element={<ClientOrders />} />
+            <Route path="/order-entry" element={<OrderEntryForm />} />
             <Route path="/entry-form" element={<EntryForm />} />
             <Route path="/phieu-xuat-kho" element={<StockReport />} />
             <Route path="/hang-con-no" element={<RemainingStock />} />
