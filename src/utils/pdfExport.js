@@ -118,7 +118,7 @@ export const exportStockReportPdf = async (group, sizes) => {
                 // 1: { cellWidth: 55, halign: 'left' }, // KHÁCH HÀNG
                 1: { cellWidth: 65, fontStyle: 'bold' }, // ĐƠN HÀNG
                 2: { cellWidth: 45 }, // ART
-                3: { cellWidth: 'auto', halign: 'left' }, // MODEL NAME
+                3: { cellWidth: 'auto', halign: 'center' }, // MODEL NAME
                 4: { cellWidth: 30 }, // SL GIAO
                 5: { cellWidth: 30 }, // CÒN LẠI
                 6: { cellWidth: 30 }, // ĐƠN VỊ
