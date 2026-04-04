@@ -53,21 +53,15 @@ export const exportStockReportPdf = async (group, sizes) => {
         doc.text("Kỳ: T1", 280, 85);
 
         // Nổi bật Tổng giao phía trên [Màu đỏ]
-        doc.setFont('Roboto', 'bold');
-        doc.setTextColor(0, 0, 0); 
-        doc.text("Tổng giao: ", 40, 105);
-
-        const labelWidth = doc.getTextWidth("Tổng giao: ");
-        const valueX = 40 + labelWidth + 5; 
-        const valueText = String(totalExported);
-        const rectWidth = doc.getTextWidth(valueText) + 10;
-
+        const totalLabel = `Tổng giao: ${totalExported}`;
+        const labelWidth = doc.getTextWidth(totalLabel);
+        const rectWidth = labelWidth + 15; 
         doc.setFillColor(255, 0, 0); 
-        doc.rect(valueX - 2, 93, rectWidth, 18, 'F');
+        doc.rect(38, 93, rectWidth, 18, 'F'); 
 
+        doc.setFont('Roboto', 'bold');
         doc.setTextColor(255, 255, 255); 
-        doc.text(valueText, valueX + 3, 105);
-        
+        doc.text(totalLabel, 45, 105);
         doc.setTextColor(0, 0, 0);
 
         // --- 3. Cấu trúc Table Data (Đã chuyển cột ART) ---
@@ -98,14 +92,15 @@ export const exportStockReportPdf = async (group, sizes) => {
 
         // Tính toán dòng Tổng Cộng (Footer) (Điều chỉnh thứ tự cột)
         const footerTotals = [
-            "", "", "Tổng", 
-            totalExported, // Tổng SL Giao
-            "", "", "", // Còn lại, Đơn vị, ART bỏ trống
-            ...activeSizes.map(s => {
-                const totalSize = group.rows.reduce((sum, row) => sum + (Number(row[sizeToCol(s)]) || 0), 0);
-                return totalSize || "-";
-            }),
-            "" // Ghi chú
+            "",             // STT
+            "",             // ĐƠN HÀNG
+            "Tổng",         // MODEL NAME (Vị trí chữ "Tổng")
+            totalExported,  // SL GIAO (Giá trị tổng duy nhất)
+            "",             // CÒN LẠI
+            "",             // ĐƠN VỊ
+            "",             // ART
+            ...activeSizes.map(() => ""), // Các cột size để trống
+            ""              // GHI CHÚ
         ];
 
         // --- 4. Render Table (Điều chỉnh chiều rộng cột ART) ---
