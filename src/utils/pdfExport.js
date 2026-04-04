@@ -155,7 +155,7 @@ export const exportStockReportPdf = async (group, sizes) => {
                     data.cell.styles.fontStyle = 'bold';
                 }
             },
-            margin: { left: 15, right: 25 },
+            margin: { left: 15, right: 22 },
             tableWidth: 'auto'
         });
 
