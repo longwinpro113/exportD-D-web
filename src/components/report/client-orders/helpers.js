@@ -7,9 +7,9 @@ export const clientOrderColumns = [
   { key: 'article', label: 'Article', width: 92 },
   { key: 'donHang', label: 'Đơn hàng', width: 120 },
   { key: 'dot', label: 'Đợt', width: 68 },
-  { key: 'crd', label: 'CRD', width: 112 },
-  { key: 'ngayXH', label: 'Ngày XH', width: 112 },
-  { key: 'ngayNH', label: 'Ngày NH', width: 112 }
+  { key: 'crd', label: 'CRD', width: 90 },
+  { key: 'ngayXH', label: 'Ngày XH', width: 90 },
+  { key: 'ngayNH', label: 'Ngày NH', width: 90 }
 ];
 
 export const stickyColumnOffsets = {
