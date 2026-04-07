@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box, Typography, List, ListItem, ListItemButton,
@@ -12,14 +12,15 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 
-import ClientOrders from './components/ClientOrders';
-import EntryForm from './components/EntryForm';
-import OrderEntryForm from './components/OrderEntryForm';
-import StockReport from './components/StockReport';
-import RemainingStock from './components/RemainingStock';
+import ClientOrders from './components/report/client-orders/ClientOrders';
+import ExportEntryForm from './components/entry-form/ExportEntryForm';
+import OrderEntryForm from './components/entry-form/OrderEntryForm';
+import StockReport from './components/report/stock/StockReportPage';
+import RemainingStock from './components/report/remaining/RemainingStockPage';
 
 const DRAWER_WIDTH = 240;
 const COLLAPSED_WIDTH = 76;
+
 
 function App() {
   const navigate = useNavigate();
@@ -29,19 +30,30 @@ function App() {
   const currentPath = location.pathname;
   const activeItemId = currentPath === '/' ? 'client-orders' : currentPath.substring(1);
 
-  const navItems = [
-    { id: 'client-orders', path: '/client-orders', label: 'Quản Lý Đơn Hàng', Icon: ManageSearchOutlinedIcon },
-    { id: 'order-entry', path: '/order-entry', label: 'Nhập Đơn Hàng', Icon: AddCircleOutlineIcon },
-    { id: 'entry-form', path: '/entry-form', label: 'Entry Form', Icon: PostAddOutlinedIcon },
-    { id: 'phieu-xuat-kho', path: '/phieu-xuat-kho', label: 'Phiếu Xuất Kho', Icon: WarehouseOutlinedIcon },
-    { id: 'hang-con-no', path: '/hang-con-no', label: 'Hàng Còn Nợ', Icon: InventoryIcon },
+  const navGroups = [
+    {
+      id: 'entry-form-group',
+      label: 'ENTRY FORM',
+      items: [
+        { id: 'order-entry', path: '/order-entry', label: 'Nhập Đơn Hàng', Icon: AddCircleOutlineIcon },
+        { id: 'entry-form', path: '/entry-form', label: 'Entry Form', Icon: PostAddOutlinedIcon },
+      ]
+    },
+    {
+      id: 'report-group',
+      label: 'REPORT',
+      items: [
+        { id: 'client-orders', path: '/client-orders', label: 'Quản Lý Đơn Hàng', Icon: ManageSearchOutlinedIcon },
+        { id: 'phieu-xuat-kho', path: '/phieu-xuat-kho', label: 'Phiếu Xuất Kho', Icon: WarehouseOutlinedIcon },
+        { id: 'hang-con-no', path: '/hang-con-no', label: 'Hàng Còn Nợ', Icon: InventoryIcon },
+      ]
+    }
   ];
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', width: '100vw', bgcolor: '#f8fafc', overflow: 'hidden' }}>
       <CssBaseline />
 
-      {/* Sidebar */}
       <Box sx={{
         width: isSidebarOpen ? DRAWER_WIDTH : COLLAPSED_WIDTH,
         flexShrink: 0,
@@ -80,75 +92,118 @@ function App() {
           </IconButton>
         </Box>
 
-        <List sx={{ width: '100%', px: isSidebarOpen ? 2 : 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {navItems.map((item) => {
-            const isActive = item.id === activeItemId;
-            const ItemIcon = item.Icon;
-            return (
-              <Tooltip key={item.id} title={isSidebarOpen ? '' : item.label} placement="right" arrow>
-                <ListItem disablePadding sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <ListItemButton
-                    onClick={() => navigate(item.path)}
-                    sx={{
-                      width: isSidebarOpen ? '100%' : 48,
-                      height: 48,
-                      minWidth: isSidebarOpen ? 'auto' : 48,
-                      maxWidth: isSidebarOpen ? 'none' : 48,
-                      mx: 'auto',
-                      justifyContent: 'flex-start',
-                      alignItems: 'center',
-                      borderRadius: '14px',
-                      backgroundColor: isActive ? '#1976d2' : 'transparent',
-                      color: isActive ? '#ffffff' : '#64748b',
-                      px: isSidebarOpen ? 2 : 0,
-                      transition: 'all 0.2s ease',
-                      overflow: 'hidden',
-                      '&:hover': {
-                        backgroundColor: isActive ? '#1565c0' : '#f8fafc',
-                        color: isActive ? '#ffffff' : '#475569'
-                      }
-                    }}
-                  >
-                    <ListItemIcon sx={{
-                      minWidth: isSidebarOpen ? 40 : 48,
-                      color: 'inherit',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      transition: 'min-width 0.2s ease'
-                    }}>
-                      <ItemIcon sx={{ fontSize: 22 }} />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={item.label}
-                      sx={{
-                        margin: 0,
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        width: isSidebarOpen ? 'auto' : 0,
-                        opacity: isSidebarOpen ? 1 : 0,
-                        transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-10px)',
-                        paddingLeft: isSidebarOpen ? 1.5 : 0
-                      }}
-                      primaryTypographyProps={{ fontWeight: isActive ? 600 : 500, fontSize: '0.92rem' }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Tooltip>
-            );
-          })}
+        <List sx={{ width: '100%', px: isSidebarOpen ? 2 : 0, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          {navGroups.map((group) => (
+            <Box key={group.id} sx={{ width: '100%' }}>
+              {isSidebarOpen && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    px: 1.5,
+                    mb: 1,
+                    color: '#94a3b8',
+                    fontWeight: 700,
+                    letterSpacing: 0.8
+                  }}
+                >
+                  {group.label}
+                </Typography>
+              )}
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {group.items.map((item) => {
+                  const isActive = item.id === activeItemId;
+                  const ItemIcon = item.Icon;
+                  return (
+                    <Tooltip key={item.id} title={isSidebarOpen ? '' : item.label} placement="right" arrow>
+                      <ListItem disablePadding sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <ListItemButton
+                          disableRipple
+                          disableTouchRipple
+                          onClick={() => navigate(item.path)}
+                          sx={{
+                            width: isSidebarOpen ? '100%' : 48,
+                            height: 48,
+                            minWidth: isSidebarOpen ? 'auto' : 48,
+                            maxWidth: isSidebarOpen ? 'none' : 48,
+                            mx: 'auto',
+                            justifyContent: 'flex-start',
+                            alignItems: 'center',
+                            borderRadius: '14px',
+                            backgroundColor: isActive ? '#1976d2' : 'transparent',
+                            color: isActive ? '#ffffff' : '#64748b',
+                            px: isSidebarOpen ? 2 : 0,
+                            outline: 'none',
+                            WebkitTapHighlightColor: 'transparent',
+                            transition: 'background-color 0.22s ease, color 0.22s ease, width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.22s ease',
+                            overflow: 'hidden',
+                            '&:hover': {
+                              backgroundColor: isActive ? '#1565c0' : '#f8fafc',
+                              color: isActive ? '#ffffff' : '#475569'
+                            },
+                            '&.Mui-focusVisible': {
+                              backgroundColor: isActive ? '#1976d2' : 'rgba(25, 118, 210, 0.06)',
+                              color: isActive ? '#ffffff' : '#475569',
+                              boxShadow: 'none',
+                              outline: 'none'
+                            },
+                            '&.Mui-selected, &.Mui-selected:hover': {
+                              backgroundColor: isActive ? '#1976d2' : 'transparent'
+                            },
+                            '&::after': {
+                              content: '""',
+                              position: 'absolute',
+                              inset: 0,
+                              borderRadius: '14px',
+                              opacity: 0,
+                              transition: 'opacity 0.2s ease',
+                              pointerEvents: 'none'
+                            }
+                          }}
+                        >
+                          <ListItemIcon sx={{
+                            minWidth: isSidebarOpen ? 40 : 48,
+                            color: 'inherit',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            transition: 'min-width 0.2s ease'
+                          }}>
+                            <ItemIcon sx={{ fontSize: 22 }} />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={item.label}
+                            sx={{
+                              margin: 0,
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                              overflow: 'hidden',
+                              whiteSpace: 'nowrap',
+                              width: isSidebarOpen ? 'auto' : 0,
+                              opacity: isSidebarOpen ? 1 : 0,
+                              transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-10px)',
+                              paddingLeft: isSidebarOpen ? 1.5 : 0
+                            }}
+                            primaryTypographyProps={{ fontWeight: isActive ? 600 : 500, fontSize: '0.92rem' }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    </Tooltip>
+                  );
+                })}
+              </Box>
+            </Box>
+          ))}
         </List>
       </Box>
 
-      {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
         <Box sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden' }}>
           <Routes>
             <Route path="/" element={<Navigate to="/client-orders" replace />} />
             <Route path="/client-orders" element={<ClientOrders />} />
             <Route path="/order-entry" element={<OrderEntryForm />} />
-            <Route path="/entry-form" element={<EntryForm />} />
+            <Route path="/entry-form" element={<ExportEntryForm />} />
             <Route path="/phieu-xuat-kho" element={<StockReport />} />
             <Route path="/hang-con-no" element={<RemainingStock />} />
           </Routes>

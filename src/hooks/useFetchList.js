@@ -1,7 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-// const API_URL = "http://localhost:5000";
+import { buildApiUrl } from "../config/api";
 
 const useFetchList = (path, query, config = {}) => {
   const [data, setData] = useState([]);
@@ -16,13 +14,12 @@ const useFetchList = (path, query, config = {}) => {
         Object.entries(query).filter(([_, v]) => v !== '' && v !== null && v !== undefined)
       );
       const queryString = new URLSearchParams(filteredQuery).toString();
-      const url = queryString ? `${API_URL}${path}?${queryString}` : `${API_URL}${path}`;
+      const url = queryString ? `${buildApiUrl(path)}?${queryString}` : buildApiUrl(path);
       
       const res = await fetch(url, config);
       if (!res.ok) throw new Error("Fetch failed");
       
       const result = await res.json();
-      console.log(`Fetch List Result (${path}):`, result);
       setData(result);
     } catch (err) {
       console.error("useFetchList Error:", err);

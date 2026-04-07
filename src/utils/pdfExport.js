@@ -40,28 +40,48 @@ export const exportStockReportPdf = async (group, sizes) => {
         const clientName = firstRow.client || firstRow.client_name || "-";
         const totalExported = group.rows.reduce((sum, r) => sum + (Number(r.shipped_quantity) || 0), 0);
 
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const tableColumnWidths = [
+            25,
+            70,
+            60,
+            35,
+            35,
+            30,
+            50,
+            ...activeSizes.map(() => 22),
+            45
+        ];
+        const desiredTableWidth = tableColumnWidths.reduce((sum, width) => sum + width, 0);
+        const maxTableWidth = pageWidth - 40;
+        const tableWidth = Math.min(desiredTableWidth, maxTableWidth);
+        const tableMargin = Math.max(20, (pageWidth - tableWidth) / 2);
+        const tableLeft = tableMargin;
+        const tableRight = tableLeft + tableWidth;
+
         // --- 2. Header & Top Summary (Giữ nguyên) ---
         doc.setFont('Roboto', 'bold');
         doc.setFontSize(16);
-        doc.text("BIỂU GIAO THÀNH PHẨM", 35, 40);
+        doc.text("BIỂU GIAO THÀNH PHẨM", tableLeft, 40);
         
         doc.setFont('Roboto', 'normal');
         doc.setFontSize(10);
-        doc.text("ĐƠN VỊ CHUYỂN: DD (Long An)", 35, 60);
-        doc.text(`ĐƠN VỊ LÃNH: ${clientName.toUpperCase()}`, 600, 60);
-        doc.text(`Ngày: ${group.date}`, 35, 85);
-        doc.text("Kỳ: T1", 250, 85);
+        doc.text("ĐƠN VỊ CHUYỂN: DD (Long An)", tableLeft, 60);
+        doc.text(`ĐƠN VỊ LÃNH: ${clientName.toUpperCase()}`, tableRight, 60, { align: "right" });
+        const summaryY = 85;
+        doc.text(`Ngày: ${group.date}`, tableLeft, summaryY);
+        doc.text("Kỳ: T1", tableLeft + (tableWidth / 2), summaryY, { align: "center" });
 
         // Nổi bật Tổng giao phía trên [Màu đỏ]
         const totalLabel = `Tổng giao: ${totalExported}`;
         const labelWidth = doc.getTextWidth(totalLabel);
         const rectWidth = labelWidth + 15; 
-        doc.setFillColor(255, 0, 0); 
-        doc.rect(38, 93, rectWidth, 18, 'F'); 
+        doc.setFillColor(255, 255, 0); 
+        doc.rect(tableLeft, 93, rectWidth, 18, 'F'); 
 
         doc.setFont('Roboto', 'bold');
-        doc.setTextColor(255, 255, 255); 
-        doc.text(totalLabel, 45, 105);
+        doc.setTextColor(0, 0, 0); 
+        doc.text(totalLabel, tableLeft + 7, 105);
         doc.setTextColor(0, 0, 0);
 
         // --- 3. Cấu trúc Table Data (Đã chuyển cột ART) ---
@@ -107,8 +127,10 @@ export const exportStockReportPdf = async (group, sizes) => {
 
         const sizeStyles = {};
         activeSizes.forEach((_, index) => {
-            sizeStyles[7 + index] = { cellWidth: 22 }; 
+            sizeStyles[7 + index] = { cellWidth: 22 };
         });
+
+
 
         // --- 4. Render Table (Điều chỉnh chiều rộng cột ART) ---
         autoTable(doc, {
@@ -155,8 +177,8 @@ export const exportStockReportPdf = async (group, sizes) => {
                     data.cell.styles.fontStyle = 'bold';
                 }
             },
-            margin: { left: 15, right: 22 },
-            tableWidth: 'auto'
+            margin: { left: tableMargin, right: tableMargin },
+            tableWidth
         });
 
         doc.save(`Bieu_Giao_${clientName.replace(/\s+/g, '_')}_${group.date.replace(/\//g, '-')}.pdf`);
