@@ -12,7 +12,7 @@ import { baseCellStyle, commonTableSx, getLeadHeaderCellSx, sizeHeaderCellSx, si
 
 const RemainingStockTable = memo(function RemainingStockTable({ tableData }) {
   return (
-    <ReportTableLayout minWidth={2800} sx={commonTableSx}>
+    <ReportTableLayout sx={commonTableSx}>
         <TableHead>
           <TableRow>
             {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
