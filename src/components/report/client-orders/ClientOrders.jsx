@@ -1,8 +1,9 @@
-import React, { startTransition, useEffect, useMemo, useState } from 'react';
+import React, { startTransition, useEffect, useMemo } from 'react';
 import { Box, Paper } from '@mui/material';
 import ReportHeader from '../../common/ReportHeader';
 import useFetchList from '../../../hooks/useFetchList';
 import useQuery from '../../../hooks/useQuery';
+import useSharedReportClient from '../../../hooks/useSharedReportClient';
 import { reportPageSx } from '../shared';
 import ClientOrdersTable from './ClientOrdersTable';
 import {
@@ -13,27 +14,42 @@ import {
 } from './helpers';
 
 function ClientOrders() {
-  const [query, updateQuery] = useQuery({ q: '', client: DEFAULT_CLIENT_NAME });
+  const [sharedClient, setSharedClient] = useSharedReportClient();
+  const [query, updateQuery] = useQuery({ q: '', client: sharedClient || DEFAULT_CLIENT_NAME });
   const [rawOrders, loading] = useFetchList('/api/orders', {});
   const [clients] = useFetchList('/api/orders/clients', {});
-  const [selectedClient, setSelectedClient] = useState(null);
-  const [hasAppliedDefaultClient, setHasAppliedDefaultClient] = useState(false);
 
   const tableData = useMemo(() => mapOrdersToTableRows(rawOrders), [rawOrders]);
   const filteredData = useMemo(() => filterClientOrderRows(tableData, query), [tableData, query]);
   const orderOptions = useMemo(() => getOrderOptions(tableData, query.client), [tableData, query.client]);
+  const selectedClient = useMemo(() => {
+    const currentClient = query.client || sharedClient || DEFAULT_CLIENT_NAME;
+    return Array.isArray(clients)
+      ? clients.find((item) => item.client === currentClient) || null
+      : null;
+  }, [clients, query.client, sharedClient]);
 
   useEffect(() => {
-    if (hasAppliedDefaultClient || !Array.isArray(clients) || clients.length === 0) return;
-    const defaultClient = clients.find((item) => item.client === DEFAULT_CLIENT_NAME) || clients[0];
-    if (defaultClient) {
-      setSelectedClient(defaultClient);
-      startTransition(() => {
-        updateQuery({ client: defaultClient.client, q: '' });
-      });
-      setHasAppliedDefaultClient(true);
+    if (!Array.isArray(clients) || clients.length === 0) return;
+
+    const nextClient =
+      clients.find((item) => item.client === sharedClient) ||
+      clients.find((item) => item.client === query.client) ||
+      clients.find((item) => item.client === DEFAULT_CLIENT_NAME) ||
+      clients[0];
+
+    if (!nextClient) return;
+
+    if (sharedClient !== nextClient.client) {
+      setSharedClient(nextClient.client);
     }
-  }, [clients, hasAppliedDefaultClient, updateQuery]);
+
+    if (query.client !== nextClient.client) {
+      startTransition(() => {
+        updateQuery({ client: nextClient.client });
+      });
+    }
+  }, [clients, query.client, sharedClient, setSharedClient, updateQuery]);
 
   return (
     <Box sx={{ ...reportPageSx, fontFamily: 'Calibri, Arial, sans-serif' }}>
@@ -58,13 +74,11 @@ function ClientOrders() {
           clients={clients}
           selectedClient={selectedClient}
           onClientChange={(newClient) => {
-            setSelectedClient(newClient);
+            const nextClient = newClient ? newClient.client : '';
+            setSharedClient(nextClient);
             startTransition(() => {
-              updateQuery({ client: newClient ? newClient.client : '', q: '' });
+              updateQuery({ client: nextClient, q: '' });
             });
-            if (!newClient) {
-              setHasAppliedDefaultClient(true);
-            }
           }}
           orderOptions={orderOptions}
         />
