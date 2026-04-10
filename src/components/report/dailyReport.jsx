@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Snackbar } from '@mui/material';
-import useFetchList from '../../../hooks/useFetchList';
-import useQuery from '../../../hooks/useQuery';
-import useSharedReportClient from '../../../hooks/useSharedReportClient';
-import ReportPageLayout from '../ReportPageLayout';
-import DeleteDialog from './DeleteDialog';
-import EditDialog from './EditDialog';
-import { groupByDate } from './helpers';
-import StockReportTable from './StockReportTable';
+import useFetchList from '../../hooks/useFetchList';
+import useQuery from '../../hooks/useQuery';
+import useSharedReportClient from '../../hooks/useSharedReportClient';
+import ReportPageLayout from './ReportPageLayout';
+import DeleteDialog from './stock/DeleteDialog';
+import EditDialog from './stock/EditDialog';
+import { groupByDate } from './stock/helpers';
+import DailyReportTable from './DailyReportTable';
 
-function StockReportPage() {
+function DailyReportPage() {
   const [sharedClient, setSharedClient] = useSharedReportClient();
   const [query, updateQuery] = useQuery({ q: '', client: sharedClient });
   const [editRow, setEditRow] = useState(null);
@@ -65,7 +65,7 @@ function StockReportPage() {
           updateQuery({ client: nextClient });
         }}
       >
-        <StockReportTable
+        <DailyReportTable
           loading={loading}
           tableData={tableData}
           onEdit={setEditRow}
@@ -112,4 +112,4 @@ function StockReportPage() {
   );
 }
 
-export default React.memo(StockReportPage);
+export default React.memo(DailyReportPage);

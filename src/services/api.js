@@ -22,7 +22,7 @@ export const fetchClients = async () => {
 };
 
 export const fetchOrderExports = async (ryNumber) => {
-    const res = await fetch(buildApiUrl(`/api/export?ry_number=${encodeURIComponent(ryNumber)}`));
+    const res = await fetch(buildApiUrl(`/api/daily?ry_number=${encodeURIComponent(ryNumber)}`));
     if (!res.ok) throw new Error('Kết nối thất bại!');
     return res.json();
 };
@@ -38,7 +38,7 @@ export const fetchRemainingStock = async (searchParams) => {
 };
 
 export const fetchStockReport = async (searchParams) => {
-    let url = buildApiUrl("/api/export?");
+    let url = buildApiUrl("/api/daily?");
     if (searchParams) {
         url += new URLSearchParams(searchParams).toString();
     }
@@ -60,7 +60,7 @@ export const createOrder = async (payload) => {
 };
 
 export const exportOrder = async (payload) => {
-    const res = await fetch(buildApiUrl("/api/export"), {
+    const res = await fetch(buildApiUrl("/api/daily"), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

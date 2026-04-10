@@ -150,6 +150,17 @@ function ExportEntryForm() {
               alignItems: 'start'
             }}
           >
+            <Autocomplete
+              disablePortal
+              options={clients}
+              getOptionLabel={(option) => option.client || ''}
+              value={formData.client}
+              onChange={handleClientChange}
+              isOptionEqualToValue={(option, value) => option.client === value.client}
+              renderInput={(params) => <TextField {...params} fullWidth label="Khách hàng" />}
+              sx={getFieldInputSx(formData.client)}
+            />
+
             <DatePicker
               label="Ngày giao hàng"
               format="DD/MM/YYYY"
@@ -185,19 +196,9 @@ function ExportEntryForm() {
               sx={getFieldInputSx(formData.order)}
             />
 
-            <Autocomplete
-              disablePortal
-              options={clients}
-              getOptionLabel={(option) => option.client || ''}
-              value={formData.client}
-              onChange={handleClientChange}
-              isOptionEqualToValue={(option, value) => option.client === value.client}
-              renderInput={(params) => <TextField {...params} fullWidth label="Khách hàng" />}
-              sx={getFieldInputSx(formData.client)}
-            />
-
             <TextField fullWidth label="Article" value={selectedOrder?.article || ''} disabled sx={readOnlyInputSx} />
             <TextField fullWidth label="Model Name" value={selectedOrder?.model_name || ''} disabled sx={readOnlyInputSx} />
+            <TextField fullWidth label="Product" value={selectedOrder?.product || ''} disabled sx={readOnlyInputSx} />
             <TextField
               fullWidth
               label="Ghi chú"

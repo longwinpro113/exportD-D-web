@@ -31,15 +31,15 @@ const StockReportTable = memo(function StockReportTable({
     <ReportTableLayout minWidth={2400} sx={commonTableSx}>
         <TableHead>
           <TableRow>
-            {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+            {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'Product', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Ngày', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
               <TableCell key={h} sx={getLeadHeaderCellSx(i)}>
                 {h}
               </TableCell>
             ))}
             {sizes.map((size) => <TableCell key={size} sx={sizeHeaderCellSx}>{size}</TableCell>)}
-            <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 700, top: 0, zIndex: 1, minWidth: '100px' }}>Ghi chú</TableCell>
-            <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 700,  top: 0, zIndex: 1, minWidth: '120px' }}>Cập nhật lúc</TableCell>
-            <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, right: 0, zIndex: 13, borderLeft: '2px solid #e2e8f0' }}>Actions</TableCell>
+            <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, zIndex: 1, minWidth: '100px', textAlign: 'center' }}>Ghi chú</TableCell>
+            <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, zIndex: 1, minWidth: '120px', textAlign: 'center' }}>Cập nhật lúc</TableCell>
+            <TableCell sx={{ bgcolor: '#f8fafc', fontWeight: 700, position: 'sticky', top: 0, right: 0, zIndex: 13, borderLeft: '2px solid #e2e8f0', textAlign: 'center' }}>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -47,7 +47,7 @@ const StockReportTable = memo(function StockReportTable({
             <React.Fragment key={gIdx}>
               <GroupedDateRow
                 label={group.date}
-                colSpan={sizes.length + 13}
+                colSpan={sizes.length + 14}
                 onPrint={() => exportStockReportPdf(group, sizes)}
                 backgroundColor="#e8f3ff"
                 accentColor="#1976d2"
@@ -64,11 +64,12 @@ const StockReportTable = memo(function StockReportTable({
                     <TableCell sx={{ ...baseCellStyle, fontWeight: 800, color: '#DAA06D' }}>{row.delivery_round}</TableCell>
                     <TableCell sx={{ ...baseCellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article}</TableCell>
                     <TableCell sx={{ ...baseCellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, color: '#1976d2', fontWeight: 700, width: '110px', minWidth: '110px', maxWidth: '110px' }}>{row.total_quantity}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, color: '#7c3aed', fontWeight: 700, width: '110px', minWidth: '110px', maxWidth: '110px' }}>{row.accumulated_total}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, color: '#0369a1', fontWeight: 600 }}>{row.shipped_quantity}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, fontWeight: 600, color: row.remaining_quantity <= 0 ? '#16a34a' : '#ef4444' }}>{row.remaining_quantity}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, bgcolor: status.bg, color: status.color, fontWeight: 800, fontSize: '0.75rem' }}>{status.label}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, fontWeight: 800, color: '#DAA06D', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.product || '-'}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, color: '#1976d2', fontWeight: 700, width: '110px', minWidth: '110px', maxWidth: '110px', textAlign: 'center' }}>{row.total_quantity}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, color: '#7c3aed', fontWeight: 700, width: '110px', minWidth: '110px', maxWidth: '110px', textAlign: 'center' }}>{row.accumulated_total}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, color: '#0369a1', fontWeight: 600, textAlign: 'center' }}>{row.shipped_quantity}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, fontWeight: 600, color: row.remaining_quantity <= 0 ? '#16a34a' : '#ef4444', textAlign: 'center' }}>{row.remaining_quantity}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, bgcolor: status.bg, color: status.color, fontWeight: 800, fontSize: '0.75rem', textAlign: 'center' }}>{status.label}</TableCell>
                     {sizes.map((s) => {
                       const val = row[sizeToCol(s)];
                       return (
@@ -89,8 +90,8 @@ const StockReportTable = memo(function StockReportTable({
                         </TableCell>
                       );
                     })}
-                    <TableCell sx={{ ...baseCellStyle, color: '#475569', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.note || '-'}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, color: 'black', fontSize: '0.82rem', fontWeight: 800 }}>
+                    <TableCell sx={{ ...baseCellStyle, color: '#475569', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'center' }}>{row.note || '-'}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, color: 'black', fontSize: '0.82rem', fontWeight: 800, textAlign: 'center' }}>
                       {formatVietnameseDateTime(row.updated_at)}
                     </TableCell>
                     <TableCell sx={{ ...baseCellStyle, position: 'sticky', right: 0, bgcolor: 'white', zIndex: 5, borderLeft: '2px solid #e2e8f0' }}>

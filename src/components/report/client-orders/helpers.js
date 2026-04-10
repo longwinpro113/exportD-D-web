@@ -6,6 +6,7 @@ export const clientOrderColumns = [
   { key: 'stt', label: 'STT', width: 56 },
   { key: 'article', label: 'Article', width: 92 },
   { key: 'donHang', label: 'Đơn hàng', width: 120 },
+  { key: 'product', label: 'Product', width: 120 },
   { key: 'dot', label: 'Đợt', width: 68 },
   { key: 'crd', label: 'CRD', width: 90 },
   { key: 'ngayXH', label: 'Ngày XH', width: 90 },
@@ -15,7 +16,8 @@ export const clientOrderColumns = [
 export const stickyColumnOffsets = {
   stt: 0,
   article: 56,
-  donHang: 148
+  donHang: 148,
+  product: 268
 };
 
 export const formatDate = (value) => {
@@ -33,6 +35,7 @@ export const mapOrdersToTableRows = (rawOrders) => {
     id: `${item.ry_number || 'order'}-${index}`,
     article: item.article || '-',
     donHang: item.ry_number || '-',
+    product: item.product || '-',
     dot: item.delivery_round || '-',
     crd: formatDate(item.CRD),
     ngayXH: formatDate(item.client_export_date),

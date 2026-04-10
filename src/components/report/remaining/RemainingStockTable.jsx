@@ -15,7 +15,7 @@ const RemainingStockTable = memo(function RemainingStockTable({ tableData }) {
     <ReportTableLayout sx={commonTableSx}>
         <TableHead>
           <TableRow>
-            {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+            {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'Product', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
               <TableCell key={h} sx={getLeadHeaderCellSx(i)}>
                 {h}
               </TableCell>
@@ -29,7 +29,7 @@ const RemainingStockTable = memo(function RemainingStockTable({ tableData }) {
             <React.Fragment key={groupIdx}>
               <GroupedDateRow
                 label={group.date}
-                colSpan={sizes.length + 9}
+                colSpan={sizes.length + 10}
                 onPrint={() => exportStockReportPdf(group, sizes)}
                 backgroundColor="#fff4e5"
                 accentColor="#dd6b20"
@@ -46,10 +46,11 @@ const RemainingStockTable = memo(function RemainingStockTable({ tableData }) {
                     <TableCell sx={baseCellStyle}>{row.delivery_round || ''}</TableCell>
                     <TableCell sx={{ ...baseCellStyle, maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.article || ''}</TableCell>
                     <TableCell sx={{ ...baseCellStyle, maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.model_name || ''}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, color: '#1976d2', fontWeight: 600, width: '100px', minWidth: '100px', maxWidth: '100px' }}>{row.total_quantity}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, color: '#6366f1', fontWeight: 600, width: '100px', minWidth: '100px', maxWidth: '100px' }}>{row.accumulated_total}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, color: '#ea580c', fontWeight: 800 }}>{row.remaining_quantity}</TableCell>
-                    <TableCell sx={{ ...baseCellStyle, bgcolor: isOk ? '#dcfce7 !important' : '#fee2e2 !important', color: isOk ? '#16a34a !important' : '#dc2626 !important', fontWeight: 800, fontSize: '0.75rem' }}>
+                    <TableCell sx={{ ...baseCellStyle, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.product || '-'}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, color: '#1976d2', fontWeight: 600, width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' }}>{row.total_quantity}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, color: '#6366f1', fontWeight: 600, width: '100px', minWidth: '100px', maxWidth: '100px', textAlign: 'center' }}>{row.accumulated_total}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, color: (parseFloat(row.remaining_quantity) || 0) <= 0 ? '#16a34a' : '#ef4444', fontWeight: 800, textAlign: 'center' }}>{row.remaining_quantity}</TableCell>
+                    <TableCell sx={{ ...baseCellStyle, bgcolor: isOk ? '#dcfce7 !important' : '#fee2e2 !important', color: isOk ? '#16a34a !important' : '#dc2626 !important', fontWeight: 800, fontSize: '0.75rem', textAlign: 'center' }}>
                       {isOk ? 'OK' : 'Not OK'}
                     </TableCell>
                     {sizes.map((size) => {

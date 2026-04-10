@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box, Typography, List, ListItem, ListItemButton,
@@ -12,11 +12,14 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
+
 import ClientOrders from './components/report/client-orders/ClientOrders';
 import ExportEntryForm from './components/entry-form/ExportEntryForm';
 import OrderEntryForm from './components/entry-form/OrderEntryForm';
 import StockReport from './components/report/stock/StockReportPage';
 import RemainingStock from './components/report/remaining/RemainingStockPage';
+import MonthlyReport from './components/report/monthly/MonthlyReportPage';
 
 const DRAWER_WIDTH = 240;
 const COLLAPSED_WIDTH = 76;
@@ -35,8 +38,8 @@ function App() {
       id: 'entry-form-group',
       label: 'ENTRY FORM',
       items: [
-        { id: 'order-entry', path: '/order-entry', label: 'Nhập Đơn Hàng', Icon: AddCircleOutlineIcon },
-        { id: 'entry-form', path: '/entry-form', label: 'Entry Form', Icon: PostAddOutlinedIcon },
+        { id: 'orders-entry-form', path: '/orders-entry-form', label: 'Nhập Đơn Hàng', Icon: AddCircleOutlineIcon },
+        { id: 'export-entry-form', path: '/export-entry-form', label: 'Entry Form', Icon: PostAddOutlinedIcon },
       ]
     },
     {
@@ -44,8 +47,9 @@ function App() {
       label: 'REPORT',
       items: [
         { id: 'client-orders', path: '/client-orders', label: 'Quản Lý Đơn Hàng', Icon: ManageSearchOutlinedIcon },
-        { id: 'phieu-xuat-kho', path: '/phieu-xuat-kho', label: 'Phiếu Xuất Kho', Icon: WarehouseOutlinedIcon },
-        { id: 'hang-con-no', path: '/hang-con-no', label: 'Hàng Còn Nợ', Icon: InventoryIcon },
+        { id: 'daily-report', path: '/daily-report', label: 'Phiếu Xuất Kho', Icon: WarehouseOutlinedIcon },
+        { id: 'remaining-report', path: '/remaining-report', label: 'Hàng Còn Nợ', Icon: InventoryIcon },
+        { id: 'monthly-report', path: '/monthly-report', label: 'Báo Cáo Công Nợ', Icon: AssessmentOutlinedIcon },
       ]
     }
   ];
@@ -202,10 +206,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/client-orders" replace />} />
             <Route path="/client-orders" element={<ClientOrders />} />
-            <Route path="/order-entry" element={<OrderEntryForm />} />
-            <Route path="/entry-form" element={<ExportEntryForm />} />
-            <Route path="/phieu-xuat-kho" element={<StockReport />} />
-            <Route path="/hang-con-no" element={<RemainingStock />} />
+            <Route path="/orders-entry-form" element={<OrderEntryForm />} />
+            <Route path="/export-entry-form" element={<ExportEntryForm />} />
+            <Route path="/daily-report" element={<StockReport />} />
+            <Route path="/remaining-report" element={<RemainingStock />} />
+            <Route path="/monthly-report" element={<MonthlyReport />} />
           </Routes>
         </Box>
       </Box>

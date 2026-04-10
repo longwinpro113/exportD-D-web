@@ -47,10 +47,13 @@ const renderOrderRow = (row) => (
     <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[2].width, minWidth: clientOrderColumns[2].width, maxWidth: clientOrderColumns[2].width, ...stickyCellStyle('donHang') }}>
       <Box component="span" sx={{ display: 'inline-block', fontWeight: 700, color: '#0f172a' }}>{row.donHang}</Box>
     </TableCell>
-    <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[3].width, minWidth: clientOrderColumns[3].width, maxWidth: clientOrderColumns[3].width, color: '#DAA06D', fontWeight: 800 }}>{row.dot}</TableCell>
-    <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[4].width, minWidth: clientOrderColumns[4].width, maxWidth: clientOrderColumns[4].width, color: '#DAA06D', fontWeight: 800 }}>{row.crd}</TableCell>
-    <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[5].width, minWidth: clientOrderColumns[5].width, maxWidth: clientOrderColumns[5].width, color: '#DAA06D', fontWeight: 800 }}>{row.ngayXH}</TableCell>
-    <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[6].width, minWidth: clientOrderColumns[6].width, maxWidth: clientOrderColumns[6].width, color: '#DAA06D', fontWeight: 800 }}>{row.ngayNH}</TableCell>
+    <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[3].width, minWidth: clientOrderColumns[3].width, maxWidth: clientOrderColumns[3].width, ...stickyCellStyle('product') }}>
+      <Box component="span" sx={{ display: 'inline-block', fontWeight: 700, color: '#0f172a' }}>{row.product}</Box>
+    </TableCell>
+    <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[4].width, minWidth: clientOrderColumns[4].width, maxWidth: clientOrderColumns[4].width, color: '#DAA06D', fontWeight: 800 }}>{row.dot}</TableCell>
+    <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[5].width, minWidth: clientOrderColumns[5].width, maxWidth: clientOrderColumns[5].width, color: '#DAA06D', fontWeight: 800 }}>{row.crd}</TableCell>
+    <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[6].width, minWidth: clientOrderColumns[6].width, maxWidth: clientOrderColumns[6].width, color: '#DAA06D', fontWeight: 800 }}>{row.ngayXH}</TableCell>
+    <TableCell align="center" sx={{ ...cellStyle, width: clientOrderColumns[7].width, minWidth: clientOrderColumns[7].width, maxWidth: clientOrderColumns[7].width, color: '#DAA06D', fontWeight: 800 }}>{row.ngayNH}</TableCell>
     {sizes.map((size) => {
       const value = row.sizeValues[size];
       const isEmpty = value === '' || value === null || Number(value) === 0;
@@ -160,7 +163,7 @@ const ClientOrdersTable = memo(function ClientOrdersTable({ rows }) {
                     {group.client}
                   </Typography>
                 </TableCell>
-                <TableCell colSpan={4 + sizes.length} sx={groupRowCellSx} />
+                <TableCell colSpan={5 + sizes.length} sx={groupRowCellSx} />
               </TableRow>
               {group.rows.map((row) => renderOrderRow(row))}
             </React.Fragment>

@@ -24,24 +24,20 @@ const ReportHeader = React.memo(({
     return () => clearTimeout(timer);
   }, [localSearch, onSearch]);
 
-  useEffect(() => {
-    setLocalSearch('');
-  }, [selectedClient?.client]);
-
   return (
-    <Box sx={{ p: 2.5, pb: 2 }}>
+    <Box sx={{ p: 2.5, pb: 2, fontFamily: 'Calibri, Arial, sans-serif' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
         <Box>
-          <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <Typography sx={{ fontFamily: 'Calibri, Arial, sans-serif', fontWeight: 800, fontSize: '1.05rem', color: '#1e293b', textTransform: 'uppercase', letterSpacing: 0.5 }}>
             {title || 'BIỂU GIAO THÀNH PHẨM'}
           </Typography>
-          <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', mt: 0.4, fontWeight: 500 }}>
+          <Typography sx={{ fontFamily: 'Calibri, Arial, sans-serif', fontSize: '0.85rem', color: '#94a3b8', mt: 0.4, fontWeight: 500 }}>
             {sender || 'Đơn vị chuyển: DD (Long An)'}
           </Typography>
         </Box>
         <Box sx={{ textAlign: 'right' }}>
-          <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>Đơn vị lãnh</Typography>
-          <Typography sx={{ fontSize: '0.85rem', color: '#94a3b8', mt: 0.5, fontWeight: 500 }}>
+          <Typography sx={{ fontFamily: 'Calibri, Arial, sans-serif', fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>Đơn vị lãnh</Typography>
+          <Typography sx={{ fontFamily: 'Calibri, Arial, sans-serif', fontSize: '0.85rem', color: '#94a3b8', mt: 0.5, fontWeight: 500 }}>
             {receiver || '-'}
           </Typography>
         </Box>
@@ -54,7 +50,7 @@ const ReportHeader = React.memo(({
             disableClearable
             options={clients}
             getOptionLabel={(option) => option.client || ''}
-            isOptionEqualToValue={(option, value) => option.client === value.client}
+            isOptionEqualToValue={(option, value) => option.client === value?.client}
             value={selectedClient || clients[0] || null}
             onChange={(e, newVal) => {
               if (newVal) onClientChange(newVal);
@@ -116,7 +112,7 @@ const ReportHeader = React.memo(({
                     <>
                       {loading ? (
                         <CircularProgress size={16} sx={{ color: '#94a3b8', mr: 1 }} />
-                      ) : !!localSearch ? (
+                      ) : localSearch.length > 0 ? (
                         <IconButton size="small" onClick={() => setLocalSearch('')}>
                           <ClearIcon sx={{ fontSize: '1.1rem', color: '#94a3b8' }} />
                         </IconButton>
@@ -128,12 +124,12 @@ const ReportHeader = React.memo(({
               />
             )}
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                bgcolor: '#ffffff',
-                '& fieldset': { borderColor: '#e2e8f0' },
-                '&.Mui-focused fieldset': { borderColor: '#1976d2' }
-              }
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  bgcolor: '#ffffff',
+                  '& fieldset': { borderColor: '#e2e8f0' },
+                  '&.Mui-focused fieldset': { borderColor: '#1976d2' }
+                }
             }}
           />
         </Box>

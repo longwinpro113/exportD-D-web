@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const exportStockReportPdf = async (group, sizes) => {
+export const exportStockReportPdf = async (group, sizes, title = "BIỂU GIAO THÀNH PHẨM") => {
     try {
         const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
         
@@ -62,7 +62,7 @@ export const exportStockReportPdf = async (group, sizes) => {
         // --- 2. Header & Top Summary (Giữ nguyên) ---
         doc.setFont('Roboto', 'bold');
         doc.setFontSize(16);
-        doc.text("BIỂU GIAO THÀNH PHẨM", tableLeft, 40);
+        doc.text(title, tableLeft, 40);
         
         doc.setFont('Roboto', 'normal');
         doc.setFontSize(10);

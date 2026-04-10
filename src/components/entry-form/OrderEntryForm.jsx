@@ -45,6 +45,7 @@ const createInitialFormData = () => ({
   client_import_date: null,
   client: '',
   model_name: '',
+  product: '',
   sizeValues: {}
 });
 
@@ -96,6 +97,7 @@ function OrderEntryForm() {
         client_import_date: toApiDate(formData.client_import_date),
         client: formData.client.trim(),
         model_name: formData.model_name.trim(),
+        product: formData.product.trim(),
         total_order_qty,
         ...sizePayload
       };
@@ -137,6 +139,7 @@ function OrderEntryForm() {
               alignItems: 'start'
             }}
           >
+            <TextField fullWidth label="Khách hàng" value={formData.client} onChange={(e) => updateField('client', e.target.value)} sx={getFieldInputSx(formData.client)} />
             <TextField fullWidth label="Article" value={formData.article} onChange={(e) => updateField('article', e.target.value)} sx={getFieldInputSx(formData.article)} />
             <TextField fullWidth label="Đơn Hàng" value={formData.ry_number} onChange={(e) => updateField('ry_number', e.target.value)} sx={getFieldInputSx(formData.ry_number)} />
             <TextField fullWidth label="Đợt Giao Hàng" value={formData.delivery_round} onChange={(e) => updateField('delivery_round', e.target.value)} sx={getFieldInputSx(formData.delivery_round)} />
@@ -162,7 +165,7 @@ function OrderEntryForm() {
               slotProps={{ textField: { fullWidth: true, sx: getFieldInputSx(formData.client_import_date) } }}
             />
             <TextField fullWidth label="Model Name" value={formData.model_name} onChange={(e) => updateField('model_name', e.target.value)} sx={getFieldInputSx(formData.model_name)} />
-            <TextField fullWidth label="Khách hàng" value={formData.client} onChange={(e) => updateField('client', e.target.value)} sx={getFieldInputSx(formData.client)} />
+            <TextField fullWidth label="Product" value={formData.product} onChange={(e) => updateField('product', e.target.value)} sx={getFieldInputSx(formData.product)} />
           </Box>
         </LocalizationProvider>
 

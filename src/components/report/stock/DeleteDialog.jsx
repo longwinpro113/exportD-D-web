@@ -19,7 +19,7 @@ function DeleteDialog({ open, row, onClose, onConfirm, onNotify }) {
     if (!row) return;
     setDeleting(true);
     try {
-      const res = await fetch(buildApiUrl(`/api/export/${row.id}`), {
+      const res = await fetch(buildApiUrl(`/api/daily/${row.id}`), {
         method: 'DELETE'
       });
       if (!res.ok) {

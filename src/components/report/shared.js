@@ -15,9 +15,10 @@ export const baseCellStyle = {
   borderRight: '1px solid #cbd5e1',
   borderBottom: '1px solid #cbd5e1',
   width: 42,
+  textAlign: 'center'
 };
 
-const leadColumnWidths = [40, 120, 60, 80, 130, 100, 100];
+const leadColumnWidths = [40, 120, 60, 80, 130, 120];
 
 export const reportPageSx = {
   p: { xs: 2, md: 3 },
@@ -58,7 +59,7 @@ export const commonTableContainerSx = {
 };
 
 export const getLeadHeaderCellSx = (index) => ({
-  bgcolor: index >= 5 && index <= 8 ? '#f1f7ff' : '#f8fafc',
+  bgcolor: '#f8fafc',
   fontWeight: 800,
   fontSize: '0.82rem',
   position: 'sticky',
@@ -103,4 +104,45 @@ export const groupedDateContentSx = {
   pl: 3,
   pr: 1.5,
   justifyContent: 'center'
+};
+
+export const headerBoxSx = {
+  p: 2.5,
+  pb: 2,
+  fontFamily: 'Calibri, Arial, sans-serif'
+};
+
+export const headerTitleSx = {
+  fontFamily: 'Calibri, Arial, sans-serif',
+  fontWeight: 800,
+  fontSize: '1.05rem',
+  color: '#1e293b',
+  textTransform: 'uppercase',
+  letterSpacing: 0.5
+};
+
+export const headerSubtitleSx = {
+  fontFamily: 'Calibri, Arial, sans-serif',
+  fontSize: '0.85rem',
+  color: '#94a3b8',
+  mt: 0.4,
+  fontWeight: 500
+};
+
+export const headerInputSx = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    bgcolor: '#ffffff',
+    '& fieldset': { borderColor: '#e2e8f0' },
+    '&.Mui-focused fieldset': { borderColor: '#1976d2' }
+  }
+};
+
+export const headerLabelSx = {
+  fontFamily: 'Calibri, Arial, sans-serif',
+  fontSize: '0.75rem',
+  fontWeight: 700,
+  color: '#94a3b8',
+  mb: 0.5,
+  textTransform: 'uppercase'
 };

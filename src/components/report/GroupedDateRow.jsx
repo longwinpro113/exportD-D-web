@@ -9,7 +9,8 @@ const GroupedDateRow = memo(function GroupedDateRow({
   onPrint,  
   backgroundColor = '#f0f7ff',
   accentColor = '#1976d2',
-  hasStickyAction = false
+  hasStickyAction = false,
+  hidePrint = false
 }) {
   const middleColSpan = Math.max(1, colSpan - (hasStickyAction ? 3 : 2));
 
@@ -45,23 +46,25 @@ const GroupedDateRow = memo(function GroupedDateRow({
           <Typography sx={{ fontWeight: 700, color: accentColor, fontSize: '0.95rem', textAlign: 'center', ml: 0.35 }}>
             {label}
           </Typography>
-          <Box
-            component="button"
-            onClick={onPrint}
-            sx={{
-              border: 0,
-              background: 'transparent',
-              color: accentColor,
-              p: 0.35,
-              ml: -0.1,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
-            }}
-          >
-            <PrintOutlinedIcon sx={{ fontSize: '1.15rem' }} />
-          </Box>
+          {!hidePrint && (
+            <Box
+              component="button"
+              onClick={onPrint}
+              sx={{
+                border: 0,
+                background: 'transparent',
+                color: accentColor,
+                p: 0.35,
+                ml: -0.1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <PrintOutlinedIcon sx={{ fontSize: '1.15rem' }} />
+            </Box>
+          )}
         </Box>
       </TableCell>
       <TableCell colSpan={middleColSpan} sx={groupedDateRowCellSx(backgroundColor)} />
