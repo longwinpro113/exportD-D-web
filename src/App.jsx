@@ -16,7 +16,7 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 
 import ClientOrders from './components/report/client-orders/ClientOrders';
 import ExportEntryForm from './components/entry-form/ExportEntryForm';
-import OrderEntryForm from './components/entry-form/OrderEntryForm';
+import OrderEntryForm from './components/entry-form/OrderEntryFormClean';
 import StockReport from './components/report/stock/StockReportPage';
 import RemainingStock from './components/report/remaining/RemainingStockPage';
 import MonthlyReport from './components/report/monthly/MonthlyReportPage';
