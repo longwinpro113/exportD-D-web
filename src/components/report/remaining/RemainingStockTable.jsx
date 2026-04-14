@@ -5,17 +5,17 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { exportStockReportPdf } from '../../../utils/pdfExport';
+import { exportRemainingReportPdf } from '../../../utils/reportPdfVi';
 import GroupedDateRow from '../GroupedDateRow';
 import ReportTableLayout from '../ReportTableLayout';
 import { baseCellStyle, commonTableSx, getLeadHeaderCellSx, sizeHeaderCellSx, sizeToCol, sizes } from '../shared';
 
-const RemainingStockTable = memo(function RemainingStockTable({ tableData }) {
+const RemainingStockTable = memo(function RemainingStockTable({ tableData, onPrintGroup, clientName = '' }) {
   return (
     <ReportTableLayout sx={commonTableSx}>
         <TableHead>
           <TableRow>
-            {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'Product', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
+            {['STT', 'Đơn Hàng', 'Đợt', 'Article', 'Model Name', 'Sản Phẩm', 'SL Đơn Hàng', 'SL Tích Lũy', 'SL Còn Lại', 'Trạng Thái'].map((h, i) => (
               <TableCell key={h} sx={getLeadHeaderCellSx(i)}>
                 {h}
               </TableCell>
@@ -30,7 +30,7 @@ const RemainingStockTable = memo(function RemainingStockTable({ tableData }) {
               <GroupedDateRow
                 label={group.date}
                 colSpan={sizes.length + 10}
-                onPrint={() => exportStockReportPdf(group, sizes)}
+                onPrint={() => (onPrintGroup ? onPrintGroup(group, sizes) : exportRemainingReportPdf(group, sizes, 'CHI TIẾT HÀNG CÒN LẠI', clientName))}
                 backgroundColor="#fff4e5"
                 accentColor="#dd6b20"
               />
@@ -88,6 +88,3 @@ const RemainingStockTable = memo(function RemainingStockTable({ tableData }) {
 });
 
 export default RemainingStockTable;
-
-
-

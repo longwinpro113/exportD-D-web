@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { exportStockReportPdf } from '../../utils/pdfExport';
+import { exportStockReportPdf } from '../../utils/reportPdf';
 import GroupedDateRow from './GroupedDateRow';
 import ReportTableLayout from './ReportTableLayout';
 import { baseCellStyle, commonTableSx, getLeadHeaderCellSx, sizeHeaderCellSx, sizeToCol, sizes } from './shared';

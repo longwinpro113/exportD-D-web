@@ -40,7 +40,7 @@ function RemainingStockPage() {
 
   return (
     <ReportPageLayout
-      title="CHI TIẾT HÀNG CÒN NỢ"
+      title="CHI TIẾT HÀNG CÒN Lại"
       receiver={selectedClient ? selectedClient.client : '-'}
       placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
       onSearch={(text) => updateQuery({ q: text })}
@@ -53,7 +53,7 @@ function RemainingStockPage() {
         updateQuery({ client: nextClient });
       }}
     >
-      <RemainingStockTable tableData={tableData} />
+      <RemainingStockTable tableData={tableData} clientName={selectedClient ? selectedClient.client : ''} />
     </ReportPageLayout>
   );
 }

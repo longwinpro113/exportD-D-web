@@ -1,23 +1,19 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Alert, Box, Button, Snackbar, Paper } from '@mui/material';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+﻿import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { Alert, Box, Snackbar, Paper } from '@mui/material';
 import dayjs from 'dayjs';
 import useFetchList from '../../../hooks/useFetchList';
 import useQuery from '../../../hooks/useQuery';
 import useSharedReportClient from '../../../hooks/useSharedReportClient';
 import MonthlyReportHeader from './MonthlyReportHeader';
-import DailyReportTable from '../DailyReportTable'; // Use the same table if it fits
-import { groupByDate } from '../stock/helpers';
-import { exportStockReportPdf } from '../../../utils/pdfExport';
+import MonthlyReportTable from './MonthlyReportTable';
+import { exportMonthlyReportPdf } from '../../../utils/reportPdfVi';
 import { buildApiUrl } from '../../../config/api';
 import { reportPageSx, reportPaperSx } from '../shared';
 
 function MonthlyReportPage() {
   const [sharedClient, setSharedClient] = useSharedReportClient();
   const [selectedMonth, setSelectedMonth] = useState(dayjs());
-  const [ryNumber, setRyNumber] = useState('');
 
-  
   const dateRange = useMemo(() => {
     if (!selectedMonth) return { from: null, to: null };
     const from = selectedMonth.date(26);
@@ -28,35 +24,41 @@ function MonthlyReportPage() {
     };
   }, [selectedMonth]);
 
-  const [query, updateQuery] = useQuery({ 
+  const closingDateLabel = useMemo(() => {
+    if (!dateRange.to) return '';
+    return dayjs(dateRange.to).format('DD/MM/YYYY');
+  }, [dateRange.to]);
+
+  const [query, updateQuery] = useQuery({
     client: sharedClient,
-    from: dateRange.from,
-    to: dateRange.to,
-    ry_number: ryNumber
+    q: closingDateLabel
   });
 
-  const [data, loading, , refetch] = useFetchList('/api/daily', query);
+  const [data, loading] = useFetchList('/api/remaining-stock', query);
   const [clients] = useFetchList('/api/orders/clients', {});
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
+  const [projectedByRyNumber, setProjectedByRyNumber] = useState({});
+  const [baselineByRyNumber, setBaselineByRyNumber] = useState({});
+  const [editedProjectedByRyNumber, setEditedProjectedByRyNumber] = useState({});
+  const storageKey = useMemo(() => {
+    if (!sharedClient) return '';
+    return `monthly-report-draft:${sharedClient}`;
+  }, [sharedClient]);
 
-  // Sync state to query
   useEffect(() => {
-    updateQuery({ 
-      from: dateRange.from, 
-      to: dateRange.to,
-      ry_number: ryNumber,
-      client: sharedClient
+    updateQuery({
+      client: sharedClient,
+      q: closingDateLabel
     });
-  }, [dateRange, ryNumber, sharedClient, updateQuery]);
+  }, [closingDateLabel, sharedClient, updateQuery]);
 
-  // Fetch max month whenever the selected client changes
   useEffect(() => {
     const fetchMaxMonth = async () => {
       try {
-        const url = sharedClient 
-          ? `/api/daily/max-month?client=${encodeURIComponent(sharedClient)}` 
+        const url = sharedClient
+          ? `/api/daily/max-month?client=${encodeURIComponent(sharedClient)}`
           : '/api/daily/max-month';
-          
+
         const res = await fetch(buildApiUrl(url));
         if (res.ok) {
           const result = await res.json();
@@ -79,36 +81,151 @@ function MonthlyReportPage() {
   }, [sharedClient]);
 
   const tableData = useMemo(() => {
-    if (!Array.isArray(data)) return [];
-    if (data.length === 0) return [];
-    
+    const rows = Array.isArray(data) ? data : [];
+    if (rows.length === 0) return [];
+
     return [{
       date: selectedMonth.format('MM/YYYY'),
-      rows: data
+      rows
     }];
   }, [data, selectedMonth]);
+
+  useEffect(() => {
+    if (tableData.length === 0) {
+      setProjectedByRyNumber({});
+      setBaselineByRyNumber({});
+      setEditedProjectedByRyNumber({});
+      return;
+    }
+
+    const baseProjected = {};
+
+    tableData.forEach((group) => {
+      group.rows.forEach((row) => {
+        if (!row?.ry_number) return;
+        baseProjected[row.ry_number] = Number(row.accumulated_total) || 0;
+      });
+    });
+
+    if (!storageKey) {
+      setProjectedByRyNumber(baseProjected);
+      setBaselineByRyNumber(baseProjected);
+      setEditedProjectedByRyNumber({});
+      return;
+    }
+
+    try {
+      const raw = localStorage.getItem(storageKey);
+      setBaselineByRyNumber(baseProjected);
+      if (!raw) {
+        setProjectedByRyNumber(baseProjected);
+        setEditedProjectedByRyNumber({});
+        return;
+      }
+
+      const saved = JSON.parse(raw);
+      const savedMonthChanges = saved?.months?.[closingDateLabel] || {};
+      setProjectedByRyNumber({
+        ...baseProjected,
+        ...savedMonthChanges
+      });
+      setEditedProjectedByRyNumber(Object.fromEntries(
+        Object.keys(savedMonthChanges).map((ryNumber) => [ryNumber, true])
+      ));
+    } catch (err) {
+      console.warn('Failed to restore monthly draft:', err);
+      setProjectedByRyNumber(baseProjected);
+      setEditedProjectedByRyNumber({});
+    }
+  }, [closingDateLabel, storageKey, tableData]);
+
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      const changedValues = Object.fromEntries(
+        Object.entries(projectedByRyNumber)
+          .filter(([ryNumber]) => editedProjectedByRyNumber[ryNumber])
+          .map(([ryNumber, value]) => [ryNumber, value])
+      );
+
+      const existing = (() => {
+        try {
+          return JSON.parse(localStorage.getItem(storageKey) || '{}');
+        } catch (err) {
+          return {};
+        }
+      })();
+
+      const next = {
+        ...existing,
+        months: {
+          ...(existing.months || {}),
+          [closingDateLabel]: changedValues
+        }
+      };
+
+      if (Object.keys(changedValues).length === 0) {
+        if (next.months) {
+          delete next.months[closingDateLabel];
+        }
+        if (next.months && Object.keys(next.months).length === 0) {
+          delete next.months;
+        }
+      }
+
+      if (Object.keys(next).length === 0) {
+        localStorage.removeItem(storageKey);
+      } else {
+        localStorage.setItem(storageKey, JSON.stringify(next));
+      }
+    } catch (err) {
+      console.warn('Failed to save monthly draft:', err);
+    }
+  }, [closingDateLabel, editedProjectedByRyNumber, projectedByRyNumber, storageKey]);
+
+  const pdfTableData = useMemo(() => {
+    return tableData.map((group) => ({
+      ...group,
+      rows: group.rows.map((row) => {
+        const actualAccumulated = Number(row.accumulated_total) || 0;
+        const projectedAccumulated = projectedByRyNumber[row.ry_number] !== undefined
+          ? Number(projectedByRyNumber[row.ry_number]) || 0
+          : actualAccumulated;
+        const totalQuantity = Number(row.total_quantity) || 0;
+
+        return {
+          ...row,
+          pdf_shipped_total: projectedAccumulated,
+          pdf_remaining_quantity: Math.max(totalQuantity - projectedAccumulated, 0)
+        };
+      })
+    }));
+  }, [projectedByRyNumber, tableData]);
+
   const selectedClientObj = useMemo(
     () => (Array.isArray(clients) ? clients.find((item) => item.client === (query.client || sharedClient)) || null : null),
     [clients, query.client, sharedClient]
   );
 
-  const handleExportPdf = useCallback(() => {
-    if (tableData.length === 0) {
+  const handleExportPdf = useCallback((group) => {
+    if (!group || !Array.isArray(group.rows) || group.rows.length === 0) {
       setToast({ open: true, message: 'Không có dữ liệu để xuất PDF.', severity: 'warning' });
       return;
     }
-    const allRows = tableData.flatMap(group => group.rows);
+
     const fullRangeLabel = `${dayjs(dateRange.from).format('DD/MM/YYYY')} - ${dayjs(dateRange.to).format('DD/MM/YYYY')}`;
-    const reportData = { date: fullRangeLabel, rows: allRows };
+    const reportData = { ...group, date: fullRangeLabel };
 
     import('../shared').then(({ sizes }) => {
-      exportStockReportPdf(reportData, sizes, "BÁO CÁO CÔNG NỢ");
+      exportMonthlyReportPdf(reportData, sizes, 'BÁO CÁO CÔNG NỢ', selectedClientObj ? selectedClientObj.client : '');
     });
-  }, [tableData, dateRange]);
+  }, [dateRange, selectedClientObj]);
 
   const toastSx = (severity) => ({
     borderRadius: '12px',
-    px: 1.5, py: 1, alignItems: 'center',
+    px: 1.5,
+    py: 1,
+    alignItems: 'center',
     backgroundColor: severity === 'success' ? '#ecfdf5' : '#fef2f2',
     color: severity === 'success' ? '#166534' : '#991b1b',
     border: `1px solid ${severity === 'success' ? '#bbf7d0' : '#fecaca'}`,
@@ -127,8 +244,6 @@ function MonthlyReportPage() {
             const nextClient = newClient ? newClient.client : '';
             setSharedClient(nextClient);
           }}
-          ryNumber={ryNumber}
-          onRyNumberChange={setRyNumber}
           selectedMonth={selectedMonth}
           onMonthChange={setSelectedMonth}
           fromDate={dateRange.from}
@@ -137,14 +252,35 @@ function MonthlyReportPage() {
         />
 
         <Box sx={{ flex: 1, borderTop: '1px solid #e2e8f0', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
-          <DailyReportTable
+          <MonthlyReportTable
             loading={loading}
-            tableData={tableData}
-            onEdit={() => {}} 
-            onDelete={() => {}}
-            hidePrint={false}
-            showActions={false}
-            onPrintGroup={() => handleExportPdf()}
+            tableData={pdfTableData}
+            projectedByRyNumber={projectedByRyNumber}
+            editedProjectedByRyNumber={editedProjectedByRyNumber}
+            onProjectedChange={(ryNumber, value) => {
+              setProjectedByRyNumber((prev) => ({
+                ...prev,
+                [ryNumber]: value
+              }));
+              setEditedProjectedByRyNumber((prev) => ({
+                ...prev,
+                [ryNumber]: true
+              }));
+            }}
+            onProjectedRevert={(ryNumber) => {
+              setProjectedByRyNumber((prev) => {
+                return {
+                  ...prev,
+                  [ryNumber]: baselineByRyNumber[ryNumber] ?? prev[ryNumber]
+                };
+              });
+              setEditedProjectedByRyNumber((prev) => ({
+                ...prev,
+                [ryNumber]: false
+              }));
+            }}
+            onPrintGroup={handleExportPdf}
+            clientName={selectedClientObj ? selectedClientObj.client : ''}
           />
         </Box>
       </Paper>

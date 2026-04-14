@@ -48,7 +48,7 @@ function App() {
       items: [
         { id: 'client-orders', path: '/client-orders', label: 'Quản Lý Đơn Hàng', Icon: ManageSearchOutlinedIcon },
         { id: 'daily-report', path: '/daily-report', label: 'Phiếu Xuất Kho', Icon: WarehouseOutlinedIcon },
-        { id: 'remaining-report', path: '/remaining-report', label: 'Hàng Còn Nợ', Icon: InventoryIcon },
+        { id: 'remaining-report', path: '/remaining-report', label: 'Hàng Còn Lại', Icon: InventoryIcon },
         { id: 'monthly-report', path: '/monthly-report', label: 'Báo Cáo Công Nợ', Icon: AssessmentOutlinedIcon },
       ]
     }
