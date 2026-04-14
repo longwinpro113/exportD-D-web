@@ -73,6 +73,8 @@ function OrderEntryFormClean() {
   const articleOptions = useMemo(() => toUniqueSortedStrings(rawOrders, 'article'), [rawOrders]);
   const orderOptions = useMemo(() => toUniqueSortedStrings(rawOrders, 'ry_number'), [rawOrders]);
   const deliveryRoundOptions = useMemo(() => toUniqueSortedStrings(rawOrders, 'delivery_round'), [rawOrders]);
+  const modelNameOptions = useMemo(() => toUniqueSortedStrings(rawOrders, 'model_name'), [rawOrders]);
+  const productOptions = useMemo(() => toUniqueSortedStrings(rawOrders, 'product'), [rawOrders]);
 
   const updateField = useCallback((field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -262,8 +264,28 @@ function OrderEntryFormClean() {
               onChange={(newValue) => updateField('client_import_date', newValue)}
               slotProps={{ textField: { fullWidth: true, sx: getFieldInputSx(formData.client_import_date) } }}
             />
-            <TextField fullWidth label="Model Name" value={formData.model_name} onChange={(e) => updateField('model_name', e.target.value)} sx={getFieldInputSx(formData.model_name)} />
-            <TextField fullWidth label="Product" value={formData.product} onChange={(e) => updateField('product', e.target.value)} sx={getFieldInputSx(formData.product)} />
+            <Autocomplete
+              freeSolo
+              openOnFocus
+              options={modelNameOptions}
+              value={formData.model_name}
+              inputValue={formData.model_name}
+              onChange={(_, newValue) => updateField('model_name', typeof newValue === 'string' ? newValue : newValue || '')}
+              onInputChange={(_, newInputValue) => updateField('model_name', newInputValue)}
+              renderInput={(params) => <TextField {...params} fullWidth label="Model Name" />}
+              sx={getFieldInputSx(formData.model_name)}
+            />
+            <Autocomplete
+              freeSolo
+              openOnFocus
+              options={productOptions}
+              value={formData.product}
+              inputValue={formData.product}
+              onChange={(_, newValue) => updateField('product', typeof newValue === 'string' ? newValue : newValue || '')}
+              onInputChange={(_, newInputValue) => updateField('product', newInputValue)}
+              renderInput={(params) => <TextField {...params} fullWidth label="Product" />}
+              sx={getFieldInputSx(formData.product)}
+            />
           </Box>
         </LocalizationProvider>
 
