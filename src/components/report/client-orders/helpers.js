@@ -10,7 +10,8 @@ export const clientOrderColumns = [
   { key: 'dot', label: 'Đợt', width: 68 },
   { key: 'crd', label: 'CRD', width: 90 },
   { key: 'ngayXH', label: 'Ngày XH', width: 90 },
-  { key: 'ngayNH', label: 'Ngày NH', width: 90 }
+  { key: 'ngayNH', label: 'Ngày NH', width: 90 },
+  { key: 'totalQty', label: 'Tổng', width: 60 }
 ];
 
 export const stickyColumnOffsets = {
@@ -36,6 +37,7 @@ export const mapOrdersToTableRows = (rawOrders) => {
     article: item.article || '-',
     donHang: item.ry_number || '-',
     product: item.product || '-',
+    totalQty: item.total_order_qty ?? '-',
     dot: item.delivery_round || '-',
     crd: formatDate(item.CRD),
     ngayXH: formatDate(item.client_export_date),
