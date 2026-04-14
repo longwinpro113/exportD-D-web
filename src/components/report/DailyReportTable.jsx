@@ -73,8 +73,8 @@ const DailyReportTable = memo(function DailyReportTable({
                   <TableCell sx={{ ...baseCellStyle, color: '#1976d2', fontWeight: 700, width: '110px', minWidth: '110px', maxWidth: '110px' }}>{row.total_quantity}</TableCell>
                   <TableCell sx={{ ...baseCellStyle, color: '#7c3aed', fontWeight: 700, width: '110px', minWidth: '110px', maxWidth: '110px' }}>{row.accumulated_total}</TableCell>
                   <TableCell sx={{ ...baseCellStyle, color: '#0369a1', fontWeight: 600, textAlign: 'center' }}>{row.shipped_quantity}</TableCell>
-                  <TableCell sx={{ ...baseCellStyle, fontWeight: 600, color: row.remaining_quantity <= 0 ? '#16a34a' : '#ef4444', textAlign: 'center' }}>{row.remaining_quantity}</TableCell>
-                  <TableCell sx={{ ...baseCellStyle, bgcolor: status.bg, color: status.color, fontWeight: 800, fontSize: '0.75rem', textAlign: 'center' }}>{status.label}</TableCell>
+                  <TableCell sx={{ ...baseCellStyle, width: '88px', minWidth: '88px', maxWidth: '88px', fontWeight: 600, color: row.remaining_quantity <= 0 ? '#16a34a' : '#ef4444', textAlign: 'center' }}>{row.remaining_quantity}</TableCell>
+                  <TableCell sx={{ ...baseCellStyle, width: '92px', minWidth: '92px', maxWidth: '92px', bgcolor: status.bg, color: status.color, fontWeight: 800, fontSize: '0.75rem', textAlign: 'center' }}>{status.label}</TableCell>
                   {sizes.map((s) => {
                     const val = row[sizeToCol(s)];
                     return (

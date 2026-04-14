@@ -19,6 +19,10 @@ export const baseCellStyle = {
 };
 
 const leadColumnWidths = [40, 120, 60, 80, 130, 120];
+const leadColumnCustomWidths = {
+  9: 88,
+  10: 92
+};
 
 export const reportPageSx = {
   p: { xs: 2, md: 3 },
@@ -65,9 +69,21 @@ export const getLeadHeaderCellSx = (index) => ({
   position: 'sticky',
   top: 0,
   left: index === 0 ? 0 : index === 1 ? '40px' : 'auto',
-  width: index < leadColumnWidths.length ? `${leadColumnWidths[index]}px` : '75px',
-  minWidth: index < leadColumnWidths.length ? `${leadColumnWidths[index]}px` : '75px',
-  maxWidth: index < leadColumnWidths.length ? `${leadColumnWidths[index]}px` : '75px',
+  width: index in leadColumnCustomWidths
+    ? `${leadColumnCustomWidths[index]}px`
+    : index < leadColumnWidths.length
+      ? `${leadColumnWidths[index]}px`
+      : '75px',
+  minWidth: index in leadColumnCustomWidths
+    ? `${leadColumnCustomWidths[index]}px`
+    : index < leadColumnWidths.length
+      ? `${leadColumnWidths[index]}px`
+      : '75px',
+  maxWidth: index in leadColumnCustomWidths
+    ? `${leadColumnCustomWidths[index]}px`
+    : index < leadColumnWidths.length
+      ? `${leadColumnWidths[index]}px`
+      : '75px',
   p: index <= 1 ? '0 !important' : undefined,
   zIndex: index === 0 ? 13 : index === 1 ? 12 : 2,
   borderRight: index <= 1 ? '1px solid #e2e8f0' : '1px solid #f1f5f9',
