@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   Alert,
+  Autocomplete,
   Box,
   Divider,
+  CircularProgress,
   Paper,
   Snackbar,
   TextField,
@@ -11,6 +13,7 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import useFetchList from '../../hooks/useFetchList';
 import { createOrder } from '../../services/api';
 import FormActions from './FormActions';
 import SizeGridSection from './SizeGridSection';
@@ -53,6 +56,17 @@ function OrderEntryForm() {
   const [formData, setFormData] = useState(createInitialFormData());
   const [saving, setSaving] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [clients, loadingClients] = useFetchList('/api/orders/clients', {});
+
+  const clientOptions = useMemo(() => {
+    if (!Array.isArray(clients)) return [];
+
+    return [...new Set(
+      clients
+        .map((item) => item?.client?.trim())
+        .filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b));
+  }, [clients]);
 
   const updateField = useCallback((field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -139,7 +153,32 @@ function OrderEntryForm() {
               alignItems: 'start'
             }}
           >
-            <TextField fullWidth label="Khách hàng" value={formData.client} onChange={(e) => updateField('client', e.target.value)} sx={getFieldInputSx(formData.client)} />
+            <Autocomplete
+              freeSolo
+              openOnFocus
+              options={clientOptions}
+              value={formData.client}
+              inputValue={formData.client}
+              onChange={(_, newValue) => updateField('client', typeof newValue === 'string' ? newValue : newValue || '')}
+              onInputChange={(_, newInputValue) => updateField('client', newInputValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  fullWidth
+                  label="Khách hàng"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loadingClients ? <CircularProgress color="inherit" size={18} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    )
+                  }}
+                />
+              )}
+              sx={getFieldInputSx(formData.client)}
+            />
             <TextField fullWidth label="Article" value={formData.article} onChange={(e) => updateField('article', e.target.value)} sx={getFieldInputSx(formData.article)} />
             <TextField fullWidth label="Đơn Hàng" value={formData.ry_number} onChange={(e) => updateField('ry_number', e.target.value)} sx={getFieldInputSx(formData.ry_number)} />
             <TextField fullWidth label="Đợt Giao Hàng" value={formData.delivery_round} onChange={(e) => updateField('delivery_round', e.target.value)} sx={getFieldInputSx(formData.delivery_round)} />
