@@ -15,6 +15,7 @@ const ReportHeader = React.memo(({
   orderOptions = []
 }) => {
   const [localSearch, setLocalSearch] = useState('');
+  const getClientLabel = (option) => option?.client || '';
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -49,9 +50,9 @@ const ReportHeader = React.memo(({
             size="small"
             disableClearable
             options={clients}
-            getOptionLabel={(option) => option.client || ''}
-            isOptionEqualToValue={(option, value) => option.client === value?.client}
-            value={selectedClient || clients[0] || null}
+            getOptionLabel={getClientLabel}
+            isOptionEqualToValue={(option, value) => getClientLabel(option) === getClientLabel(value)}
+            value={selectedClient || null}
             onChange={(e, newVal) => {
               if (newVal) onClientChange(newVal);
             }}
@@ -61,6 +62,9 @@ const ReportHeader = React.memo(({
                 overflowY: 'auto'
               }
             }}
+            renderOption={(props, option) => (
+              <li {...props}>{getClientLabel(option)}</li>
+            )}
             renderInput={(params) => (
               <TextField {...params} placeholder="Chọn khách hàng..." variant="outlined" />
             )}

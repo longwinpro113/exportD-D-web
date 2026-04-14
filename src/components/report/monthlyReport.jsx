@@ -121,9 +121,9 @@ function MonthlyReportPage() {
               size="small"
               disableClearable
               options={clients}
-              getOptionLabel={(option) => option.client || ''}
-              isOptionEqualToValue={(option, value) => option.client === value?.client}
-              value={selectedClient || clients[0] || null}
+              getOptionLabel={(option) => option?.client || ''}
+              isOptionEqualToValue={(option, value) => (option?.client || '') === (value?.client || '')}
+              value={selectedClient || null}
               onChange={(e, newVal) => {
                 if (newVal) {
                   const nextClient = newVal.client || '';

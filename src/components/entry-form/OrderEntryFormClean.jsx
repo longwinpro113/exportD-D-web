@@ -67,7 +67,9 @@ function OrderEntryFormClean() {
   const [saving, setSaving] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [clients, loadingClients] = useFetchList('/api/orders/clients', {});
-  const [rawOrders, loadingOrders] = useFetchList('/api/orders', {});
+  const selectedClientName = formData.client.trim();
+  const orderQuery = selectedClientName ? { client: selectedClientName } : { client: '__NO_CLIENT__' };
+  const [rawOrders, loadingOrders] = useFetchList('/api/orders', orderQuery);
 
   const clientOptions = useMemo(() => toUniqueSortedStrings(clients, 'client'), [clients]);
   const articleOptions = useMemo(() => toUniqueSortedStrings(rawOrders, 'article'), [rawOrders]);
@@ -89,6 +91,19 @@ function OrderEntryFormClean() {
 
   const handleReset = useCallback(() => {
     setFormData(createInitialFormData());
+  }, []);
+
+  const handleClientChange = useCallback((_, newValue) => {
+    const nextClient = typeof newValue === 'string' ? newValue : newValue || '';
+    setFormData((prev) => ({
+      ...prev,
+      client: nextClient,
+      article: '',
+      ry_number: '',
+      delivery_round: '',
+      model_name: '',
+      product: ''
+    }));
   }, []);
 
   const handleSave = useCallback(async () => {
@@ -170,7 +185,7 @@ function OrderEntryFormClean() {
               options={clientOptions}
               value={formData.client}
               inputValue={formData.client}
-              onChange={(_, newValue) => updateField('client', typeof newValue === 'string' ? newValue : newValue || '')}
+              onChange={handleClientChange}
               onInputChange={(_, newInputValue) => updateField('client', newInputValue)}
               renderInput={(params) => (
                 <TextField
@@ -194,7 +209,7 @@ function OrderEntryFormClean() {
             <Autocomplete
               freeSolo
               openOnFocus
-              options={articleOptions}
+              options={selectedClientName ? articleOptions : []}
               value={formData.article}
               inputValue={formData.article}
               onChange={(_, newValue) => updateField('article', typeof newValue === 'string' ? newValue : newValue || '')}
@@ -206,8 +221,8 @@ function OrderEntryFormClean() {
             <Autocomplete
               freeSolo
               openOnFocus
-              options={orderOptions}
-              loading={loadingOrders}
+              options={selectedClientName ? orderOptions : []}
+              loading={loadingOrders && !!selectedClientName}
               value={formData.ry_number}
               inputValue={formData.ry_number}
               onChange={(_, newValue) => updateField('ry_number', typeof newValue === 'string' ? newValue : newValue || '')}
@@ -234,7 +249,7 @@ function OrderEntryFormClean() {
             <Autocomplete
               freeSolo
               openOnFocus
-              options={deliveryRoundOptions}
+              options={selectedClientName ? deliveryRoundOptions : []}
               value={formData.delivery_round}
               inputValue={formData.delivery_round}
               onChange={(_, newValue) => updateField('delivery_round', typeof newValue === 'string' ? newValue : newValue || '')}
@@ -267,7 +282,7 @@ function OrderEntryFormClean() {
             <Autocomplete
               freeSolo
               openOnFocus
-              options={modelNameOptions}
+              options={selectedClientName ? modelNameOptions : []}
               value={formData.model_name}
               inputValue={formData.model_name}
               onChange={(_, newValue) => updateField('model_name', typeof newValue === 'string' ? newValue : newValue || '')}
@@ -278,7 +293,7 @@ function OrderEntryFormClean() {
             <Autocomplete
               freeSolo
               openOnFocus
-              options={productOptions}
+              options={selectedClientName ? productOptions : []}
               value={formData.product}
               inputValue={formData.product}
               onChange={(_, newValue) => updateField('product', typeof newValue === 'string' ? newValue : newValue || '')}

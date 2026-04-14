@@ -118,8 +118,8 @@ const MonthlyReportHeader = React.memo(({
             size="small"
             disableClearable
             options={clients}
-            getOptionLabel={(option) => option.client || ''}
-            value={selectedClient || clients[0] || null}
+            getOptionLabel={(option) => option?.client || ''}
+            value={selectedClient || null}
             onChange={(e, newValue) => onClientChange(newValue)}
             renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Chọn khách hàng..." />}
             sx={{ ...getEntryFieldSx(selectedClient), width: '250px' }}
