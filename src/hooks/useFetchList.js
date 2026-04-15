@@ -5,10 +5,19 @@ const useFetchList = (path, query, config = {}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [lastQuery, setLastQuery] = useState(JSON.stringify(query));
+
+  const currentQueryStr = JSON.stringify(query);
+  if (currentQueryStr !== lastQuery) {
+    setLastQuery(currentQueryStr);
+    setLoading(true);
+    setData([]);
+  }
 
   const fetchAPI = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setData([]); // Clear old data to avoid showing stale results
     try {
       const filteredQuery = Object.fromEntries(
         Object.entries(query).filter(([_, v]) => v !== '' && v !== null && v !== undefined)

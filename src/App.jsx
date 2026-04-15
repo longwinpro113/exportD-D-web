@@ -17,7 +17,7 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import ClientOrders from './components/report/client-orders/ClientOrders';
 import ExportEntryForm from './components/entry-form/ExportEntryForm';
 import OrderEntryForm from './components/entry-form/OrderEntryFormClean';
-import StockReport from './components/report/stock/StockReportPage';
+import HistoryExport from './components/report/stock/HistoryExportPage';
 import RemainingStock from './components/report/remaining/RemainingStockPage';
 import MonthlyReport from './components/report/monthly/MonthlyReportPage';
 
@@ -39,7 +39,7 @@ function App() {
       label: 'ENTRY FORM',
       items: [
         { id: 'orders-entry-form', path: '/orders-entry-form', label: 'Nhập Đơn Hàng', Icon: AddCircleOutlineIcon },
-        { id: 'export-entry-form', path: '/export-entry-form', label: 'Entry Form', Icon: PostAddOutlinedIcon },
+        { id: 'export-entry-form', path: '/export-entry-form', label: 'Nhập Xuất Kho', Icon: PostAddOutlinedIcon },
       ]
     },
     {
@@ -208,7 +208,8 @@ function App() {
             <Route path="/client-orders" element={<ClientOrders />} />
             <Route path="/orders-entry-form" element={<OrderEntryForm />} />
             <Route path="/export-entry-form" element={<ExportEntryForm />} />
-            <Route path="/daily-report" element={<StockReport />} />
+            <Route path="/daily-report" element={<HistoryExport />} />
+            <Route path="/history-export" element={<HistoryExport />} />
             <Route path="/remaining-report" element={<RemainingStock />} />
             <Route path="/monthly-report" element={<MonthlyReport />} />
           </Routes>

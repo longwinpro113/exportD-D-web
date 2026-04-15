@@ -56,8 +56,8 @@ function MonthlyReportPage() {
     const fetchMaxMonth = async () => {
       try {
         const url = sharedClient
-          ? `/api/daily/max-month?client=${encodeURIComponent(sharedClient)}`
-          : '/api/daily/max-month';
+          ? `/api/history-export/max-month?client=${encodeURIComponent(sharedClient)}`
+          : '/api/history-export/max-month';
 
         const res = await fetch(buildApiUrl(url));
         if (res.ok) {

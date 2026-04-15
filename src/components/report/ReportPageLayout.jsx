@@ -1,17 +1,21 @@
 import React, { memo } from 'react';
 import { Box, Paper } from '@mui/material';
-import ReportHeader from '../common/ReportHeader';
+import ReportHeader from '../common/ReportHeaderFlexible';
 import { reportPageSx, reportPaperSx } from './shared';
 
 const ReportPageLayout = memo(function ReportPageLayout({
   title,
   receiver,
-  placeholder = 'Tìm ngày (dd/mm), mã đơn hàng hoặc đợt...',
+  searchPlaceholder = 'Nhập mã đơn hàng ...',
   onSearch,
   loading,
   clients,
   selectedClient,
   onClientChange,
+  searchMode = 'order',
+  rightSideContent = null,
+  searchResetToken = 0,
+  dateOptions = [],
   children
 }) {
   return (
@@ -20,12 +24,16 @@ const ReportPageLayout = memo(function ReportPageLayout({
         <ReportHeader
           title={title}
           receiver={receiver}
-          placeholder={placeholder}
+          searchPlaceholder={searchPlaceholder}
           onSearch={onSearch}
           loading={loading}
           clients={clients}
           selectedClient={selectedClient}
           onClientChange={onClientChange}
+          searchMode={searchMode}
+          rightSideContent={rightSideContent}
+          searchResetToken={searchResetToken}
+          dateOptions={dateOptions}
         />
 
         <Box sx={{ flex: 1, borderTop: '1px solid #e2e8f0', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

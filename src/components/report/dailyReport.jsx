@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, Snackbar } from '@mui/material';
+import { Alert, Snackbar, Checkbox, FormControlLabel } from '@mui/material';
 import useFetchList from '../../hooks/useFetchList';
 import useQuery from '../../hooks/useQuery';
 import useSharedReportClient from '../../hooks/useSharedReportClient';
 import ReportPageLayout from './ReportPageLayout';
+import { buildApiUrl } from '../../config/api';
 import DeleteDialog from './stock/DeleteDialog';
 import EditDialog from './stock/EditDialog';
 import { groupByDate } from './stock/helpers';
@@ -16,10 +17,42 @@ function DailyReportPage() {
   const [deleteRow, setDeleteRow] = useState(null);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
 
-  const [data, loading, , refetch] = useFetchList('/api/daily', query);
+  const [showAll, setShowAll] = useState(false);
+  const [searchResetToken, setSearchResetToken] = useState(0);
+  const [dateOptions, setDateOptions] = useState([]);
+
   const [clients] = useFetchList('/api/orders/clients', {});
 
-  const tableData = useMemo(() => (Array.isArray(data) ? groupByDate(data) : []), [data]);
+  useEffect(() => {
+    const fetchDates = async () => {
+      try {
+        const clientQuery = query.client || sharedClient;
+        if (!clientQuery) return;
+        const res = await fetch(buildApiUrl(`/api/daily/dates?client=${encodeURIComponent(clientQuery)}`));
+        if (res.ok) {
+          const result = await res.json();
+          setDateOptions(result);
+        }
+      } catch (err) {
+        console.error('Failed to fetch available dates:', err);
+      }
+    };
+    fetchDates();
+  }, [query.client, sharedClient]);
+
+  const actualQuery = useMemo(() => {
+    if (showAll) {
+      return { ...query, q: '' };
+    }
+    return query;
+  }, [showAll, query]);
+
+  const [data, loading, , refetch] = useFetchList('/api/daily', actualQuery);
+
+  const tableData = useMemo(() => {
+    if (!showAll && !query.q) return [];
+    return Array.isArray(data) ? groupByDate(data) : [];
+  }, [data, showAll, query.q]);
   const selectedClient = useMemo(
     () => (Array.isArray(clients) ? clients.find((item) => item.client === (query.client || sharedClient)) || null : null),
     [clients, query.client, sharedClient]
@@ -54,8 +87,13 @@ function DailyReportPage() {
       <ReportPageLayout
         title="BIỂU GIAO THÀNH PHẨM"
         receiver={selectedClient ? selectedClient.client : '-'}
-        placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
-        onSearch={(text) => updateQuery({ q: text })}
+        searchPlaceholder="Nhập ngày (dd/mm)"
+        onSearch={(text) => {
+          updateQuery({ q: text });
+          if (text) {
+            setShowAll(false);
+          }
+        }}
         loading={loading}
         clients={clients}
         selectedClient={selectedClient}
@@ -64,6 +102,42 @@ function DailyReportPage() {
           setSharedClient(nextClient);
           updateQuery({ client: nextClient });
         }}
+        searchResetToken={searchResetToken}
+        searchMode="date"
+        dateOptions={dateOptions}
+        rightSideContent={
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={showAll}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setShowAll(checked);
+                  if (checked) {
+                    updateQuery({ q: '' });
+                    setSearchResetToken(Date.now());
+                  }
+                }}
+                size="small"
+                sx={{
+                  color: '#94a3b8',
+                  '&.Mui-checked': {
+                    color: '#1976d2',
+                  },
+                }}
+              />
+            }
+            label="Hiển thị tất cả"
+            sx={{
+              mr: 0,
+              '& .MuiFormControlLabel-label': {
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                color: '#475569',
+              },
+            }}
+          />
+        }
       >
         <DailyReportTable
           loading={loading}

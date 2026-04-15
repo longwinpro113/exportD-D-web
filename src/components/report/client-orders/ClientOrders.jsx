@@ -1,6 +1,6 @@
 import React, { startTransition, useEffect, useMemo } from 'react';
 import { Box, Paper } from '@mui/material';
-import ReportHeader from '../../common/ReportHeader';
+import ReportHeader from '../../common/ReportHeaderNew';
 import useFetchList from '../../../hooks/useFetchList';
 import useQuery from '../../../hooks/useQuery';
 import useSharedReportClient from '../../../hooks/useSharedReportClient';

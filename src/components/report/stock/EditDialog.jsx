@@ -63,7 +63,7 @@ function EditDialog({ open, row, onClose, onSave, onNotify }) {
         payload[sizeToCol(size)] = parseFloat(form[sizeToCol(size)]) || 0;
       });
 
-      const res = await fetch(buildApiUrl(`/api/daily/${row.id}`), {
+      const res = await fetch(buildApiUrl(`/api/history-export/${row.id}`), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

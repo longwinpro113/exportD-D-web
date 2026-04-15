@@ -42,7 +42,8 @@ function RemainingStockPage() {
     <ReportPageLayout
       title="CHI TIẾT HÀNG CÒN Lại"
       receiver={selectedClient ? selectedClient.client : '-'}
-      placeholder="Tìm ngày (dd/mm), mã đơn hàng hoặc đợt..."
+      searchPlaceholder="Nhập mã đơn hàng ..."
+      searchMode="order"
       onSearch={(text) => updateQuery({ q: text })}
       loading={loading}
       clients={clients}
